@@ -1,0 +1,11 @@
+# General
+.DS_Store
+*.log
+*.tmp
+
+# Node / build tools
+node_modules/
+
+# Editors
+.idea/
+.vscode/

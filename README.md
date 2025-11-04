@@ -29,6 +29,8 @@ gh repo sync
 | `link-check` | PRs & weekly schedule | Validates outbound links to keep references fresh. |
 | `auto-assign` | PRs & issues | Auto-assigns work to @ganesh47 when unassigned. |
 
+The project board uses the `Stage` single-select field with steps **Backlog → Selected → In Progress → Review → Done**.
+
 ## Collaboration Rules
 - Branch per task; keep history tidy with squash merges.
 - Reference issues in commits/PRs (`Closes #<id>`).

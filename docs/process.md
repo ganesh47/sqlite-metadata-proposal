@@ -35,9 +35,10 @@ This repository tracks the evolution of the **SQLite Metadata System** proposal.
 - `M3 - Implementation Plan`: transition proposal into actionable roadmap.
 
 ## Project Board
-- GitHub Project: **SQLite Metadata Proposal**.
+- GitHub Project: **SQLite Metadata Proposal** (Projects v2).
 - Columns: `Backlog`, `Selected`, `In Progress`, `Review`, `Done`.
-- Issues are auto-added via filters; move cards to reflect current state.
+- Use the `Stage` single-select field to move cards between columns.
+- Issues are auto-added via the repository link; review new entries and set Stage accordingly.
 
 ## Documentation Structure
 - `sqlite-metadata-system.md`: living proposal.

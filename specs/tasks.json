@@ -1,0 +1,28 @@
+{
+  "tasks": [
+    {
+      "title": "Spec Task: Approve scope and target stack",
+      "body": "Reference: `sqlite-metadata-system.md` section 12 (Next Steps).\n\nConfirm the recommended Fastify + TypeScript + Drizzle stack and capture the decision in the proposal before implementation work proceeds.",
+      "labels": ["status:todo", "type:process"],
+      "assignees": []
+    },
+    {
+      "title": "Spec Task: Scaffold repository packages",
+      "body": "Reference: `sqlite-metadata-system.md` section 12 (Next Steps).\n\nCreate the initial workspace structure for `packages/api`, `packages/cli`, and `apps/web`, including baseline README stubs.",
+      "labels": ["status:todo", "type:doc"],
+      "assignees": []
+    },
+    {
+      "title": "Spec Task: Author migration tooling plan",
+      "body": "Reference: `sqlite-metadata-system.md` section 12 (Next Steps).\n\nDraft the migration tooling approach for transforming existing datasets (e.g., YouTube8M) into SQLite, including CLI ergonomics.",
+      "labels": ["status:todo", "type:research"],
+      "assignees": []
+    },
+    {
+      "title": "Spec Task: Plan Phase 1 implementation demos",
+      "body": "Reference: `sqlite-metadata-system.md` section 12 (Next Steps).\n\nDefine the cadence and scope for iterative demos during Phase 1, ensuring goals and success criteria are documented.",
+      "labels": ["status:todo", "type:process"],
+      "assignees": []
+    }
+  ]
+}

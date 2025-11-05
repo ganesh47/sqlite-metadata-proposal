@@ -50,6 +50,8 @@ This repository tracks the evolution of the **SQLite Metadata System** proposal.
 - Linting: Markdown lint on pull requests.
 - Link checks: Lychee link checker nightly and on PRs touching docs.
 - Proposal snapshot: build & archive HTML/PDF on merge to `main` (planned).
+- Spec sync: `Sync Spec Tasks` workflow (weekly and on demand) reads `specs/tasks.json`
+  and ensures each entry has a corresponding GitHub issue with the right labels.
 
 ## Working With Agents
 - Capture task context in issues so autonomous agents can pick up work.

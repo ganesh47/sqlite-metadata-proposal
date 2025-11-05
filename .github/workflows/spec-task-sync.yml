@@ -1,0 +1,67 @@
+name: Sync Spec Tasks
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 12 * * 1"
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Sync spec-defined tasks with issues
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          CONFIG="specs/tasks.json"
+          if [[ ! -f "$CONFIG" ]]; then
+            echo "No spec task configuration found at $CONFIG. Skipping."
+            exit 0
+          fi
+
+          echo "Validating task configuration..."
+          jq -e '.tasks | length >= 0' "$CONFIG" >/dev/null
+
+          jq -c '.tasks[]' "$CONFIG" | while read -r task; do
+            title=$(echo "$task" | jq -r '.title')
+            body=$(echo "$task" | jq -r '.body')
+
+            mapfile -t labels < <(echo "$task" | jq -r '.labels[]?')
+            mapfile -t assignees < <(echo "$task" | jq -r '.assignees[]?')
+
+            echo "::group::Syncing \"$title\""
+            existing=$(gh issue list --state all --search "title:\"$title\"" --json number,title --jq 'map(select(.title=="'"$title"'"))[0].number' 2>/dev/null || true)
+            if [[ "$existing" == "null" ]]; then
+              existing=""
+            fi
+
+            if [[ -z "$existing" ]]; then
+              echo "Creating new issue for \"$title\""
+              cmd=(gh issue create --title "$title" --body "$body")
+              for label in "${labels[@]}"; do
+                cmd+=("--label" "$label")
+              done
+              for assignee in "${assignees[@]}"; do
+                cmd+=("--assignee" "$assignee")
+              done
+              "${cmd[@]}"
+            else
+              echo "Updating existing issue #$existing"
+              gh issue edit "$existing" --body "$body"
+              for label in "${labels[@]}"; do
+                gh issue edit "$existing" --add-label "$label"
+              done
+              for assignee in "${assignees[@]}"; do
+                gh issue edit "$existing" --add-assignee "$assignee"
+              done
+            fi
+            echo "::endgroup::"
+          done

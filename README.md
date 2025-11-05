@@ -35,6 +35,8 @@ gh repo sync
   consistency.
 - `link-check`: Runs on PRs and a weekly schedule to keep references fresh.
 - `auto-assign`: Runs on PRs and issues to auto-assign work to @ganesh47.
+- `spec-task-sync`: Runs weekly (and via manual trigger) to mirror
+  `specs/tasks.json` entries into GitHub issues with correct labels/assignees.
 
 The project board uses the `Stage` single-select field with steps **Backlog →
 Selected → In Progress → Review → Done**.

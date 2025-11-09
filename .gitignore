@@ -9,3 +9,5 @@ node_modules/
 # Editors
 .idea/
 .vscode/
+.codex/
+.specify/

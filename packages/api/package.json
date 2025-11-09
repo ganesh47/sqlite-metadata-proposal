@@ -15,6 +15,7 @@
     "openapi:client": "openapi-generator-cli generate -i src/contracts/api.yaml -g typescript-fetch -o ../cli/src/client --additional-properties=supportsES6=true,npmName=metadata-client"
   },
   "dependencies": {
+    "fastify": "^4.28.1",
     "better-sqlite3": "^9.4.4",
     "drizzle-orm": "^0.36.4",
     "pino": "^9.3.1",

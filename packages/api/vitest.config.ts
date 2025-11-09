@@ -1,9 +1,14 @@
 import { defineConfig } from "vitest/config";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const configDir = dirname(fileURLToPath(import.meta.url));
+const setupFile = resolve(configDir, "tests/setup.ts");
 
 export default defineConfig({
   test: {
     environment: "node",
-    setupFiles: ["./tests/setup.ts"],
+    setupFiles: [setupFile],
     globals: true,
     testTimeout: 10_000,
     hookTimeout: 10_000,

@@ -4,7 +4,10 @@ Auto-generated from all feature plans. Last updated: 2025-11-09
 
 ## Active Technologies
 
-- TypeScript 5.4 on Node.js 20 LTS (API), Python 3.12 (CLI), Java 21 LTS (connectors) + Fastify 5, Drizzle ORM + SQLite driver, Pino logging, Typer + SQLAlchemy, Maven 3.9 + Spring Boot 3.3 + OpenAPI-generated client, Docker 26.x, GitHub Actions CI (001-plan-alignment)
+- API: TypeScript 5.4 on Node.js 20 LTS with Fastify 5, Drizzle, and Pino
+- CLI: Python 3.12 with Typer, SQLAlchemy, Ruff, and Docker 26.x base images
+- Connectors: Java 21 LTS using Maven 3.9 + Spring Boot 3.3 + Micrometer
+- Shared tooling: GitHub Actions CI, SBOM signing, feature reference 001-plan-alignment
 
 ## Project Structure
 
@@ -15,15 +18,31 @@ tests/
 
 ## Commands
 
-cd src [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNOLOGIES] pytest [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNOLOGIES] ruff check .
+```bash
+# API
+cd packages/api && pnpm lint && pnpm vitest
+
+# CLI
+cd packages/cli && uv run ruff check . && uv run pytest
+
+# Java connectors
+cd packages/connectors/java && mvn --batch-mode verify
+```
 
 ## Code Style
 
-TypeScript 5.4 on Node.js 20 LTS (API), Python 3.12 (CLI), Java 21 LTS (connectors): Follow standard conventions
+TypeScript 5.4 on Node.js 20 LTS (API),
+Python 3.12 (CLI),
+Java 21 LTS (connectors):
+Follow standard conventions from plan/spec.
 
 ## Recent Changes
 
-- 001-plan-alignment: Added TypeScript 5.4 on Node.js 20 LTS (API), Python 3.12 (CLI), Java 21 LTS (connectors) + Fastify 5, Drizzle ORM + SQLite driver, Pino logging, Typer + SQLAlchemy, Maven 3.9 + Spring Boot 3.3 + OpenAPI-generated client, Docker 26.x, GitHub Actions CI
+- 001-plan-alignment:
+  Captured the API (TypeScript/Node/Fastify),
+  CLI (Python/Typer/SQLAlchemy),
+  and connector stack (Java/Spring Boot/Maven),
+  plus shared Docker + CI requirements.
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->

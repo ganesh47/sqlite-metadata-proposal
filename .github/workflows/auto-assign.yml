@@ -6,6 +6,10 @@ on:
   pull_request:
     types: [opened, reopened]
 
+permissions:
+  issues: write
+  pull-requests: write
+
 jobs:
   assign:
     runs-on: ubuntu-latest

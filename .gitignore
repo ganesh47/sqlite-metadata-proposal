@@ -1,13 +1,51 @@
 # General
 .DS_Store
+Thumbs.db
 *.log
 *.tmp
+*.swp
 
-# Node / build tools
+# Environment / secrets
+.env
+.env.*
+!.env.example
+.envrc
+
+# Node / TypeScript
 node_modules/
+dist/
+build/
+coverage/
+.turbo/
+.pnpm-store/
+*.tsbuildinfo
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+pip-wheel-metadata/
+*.egg-info/
+
+# Java / Maven
+target/
+*.class
+*.jar
+*.war
+*.ear
+.gradle/
+.idea_modules/
+
+# Docker / Containers
+docker-compose.override.yml
+*.sqlite
 
 # Editors
 .idea/
 .vscode/
 .codex/
-.specify/

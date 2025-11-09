@@ -28,7 +28,7 @@ description: "Task list for Polyglot Deployment Stack Alignment"
 
 **Purpose**: Establish the polyglot workspace, package directories, and Docker scaffolding from the plan.
 
-- [ ] T001 Create initial README stubs documenting scope in `packages/api/README.md`, `packages/cli/README.md`, `packages/connectors/java/README.md`, and `docker/README.md`.
+- [X] T001 Create initial README stubs documenting scope in `packages/api/README.md`, `packages/cli/README.md`, `packages/connectors/java/README.md`, and `docker/README.md`.
 - [ ] T002 Define root workspace configuration by adding `package.json` + `pnpm-workspace.yaml` at repo root with references to `packages/*`.
 - [ ] T003 Add Node.js toolchain files (`.nvmrc`, `.npmrc`) and pnpm lockfile at repository root to fix API build versions.
 - [ ] T004 Scaffold Python project metadata (`packages/cli/pyproject.toml`, `packages/cli/uv.lock`) with Typer, SQLAlchemy, and Ruff dependencies.

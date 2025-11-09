@@ -27,6 +27,7 @@
     "@types/node": "^22.8.6",
     "drizzle-kit": "^0.26.2",
     "eslint": "^9.14.0",
+    "supertest": "^7.0.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5",
     "vitest": "^2.1.1"

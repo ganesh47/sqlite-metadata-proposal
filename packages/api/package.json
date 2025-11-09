@@ -10,7 +10,9 @@
     "test": "vitest run",
     "migrate": "ts-node --esm ./scripts/migrate.ts",
     "seed": "ts-node --esm ./scripts/seed.ts",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "openapi:sync": "cp ../../specs/001-plan-alignment/contracts/api.yaml src/contracts/api.yaml",
+    "openapi:client": "openapi-generator-cli generate -i src/contracts/api.yaml -g typescript-fetch -o ../cli/src/client --additional-properties=supportsES6=true,npmName=metadata-client"
   },
   "dependencies": {
     "better-sqlite3": "^9.4.4",
@@ -19,6 +21,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@openapitools/openapi-generator-cli": "^2.10.2",
     "@types/better-sqlite3": "^7.6.10",
     "@types/node": "^22.8.6",
     "drizzle-kit": "^0.26.2",

@@ -58,7 +58,7 @@ description: "Task list for Polyglot Deployment Stack Alignment"
 
 ### Tests for User Story 1 (MUST be written first)
 
-- [ ] T013 [P] [US1] Create Vitest config + helpers in `packages/api/vitest.config.ts` and `packages/api/tests/setup.ts` enforcing coverage + perf thresholds.
+- [X] T013 [P] [US1] Create Vitest config + helpers in `packages/api/vitest.config.ts` and `packages/api/tests/setup.ts` enforcing coverage + perf thresholds.
 - [ ] T014 [P] [US1] Write `packages/api/tests/health.spec.ts` to hit `/health/ready` and assert WAL + migration metadata matches `contracts/api.yaml`.
 - [ ] T015 [P] [US1] Write `packages/api/tests/graph.spec.ts` using Supertest to upsert nodes/edges (success + validation failures) against an in-memory Fastify instance.
 

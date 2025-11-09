@@ -1,9 +1,24 @@
-import { beforeAll, afterAll } from "vitest";
+import { mkdirSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { beforeAll, afterAll, beforeEach } from "vitest";
+
+const ensureDbPath = () => {
+  const dbPath = process.env.SQLITE_PATH ?? ".vitest/metadata.sqlite";
+  const absolute = resolve(dbPath);
+  mkdirSync(dirname(absolute), { recursive: true });
+  process.env.SQLITE_PATH = absolute;
+};
 
 beforeAll(() => {
-  process.env.SQLITE_PATH = process.env.SQLITE_PATH ?? ".vitest/metadata.sqlite";
+  ensureDbPath();
+  process.env.API_PORT = process.env.API_PORT ?? "8080";
+});
+
+beforeEach(() => {
+  // Reset per-test timing budget markers if future hooks require them.
+  process.env.__TEST_STARTED_AT = Date.now().toString();
 });
 
 afterAll(() => {
-  // Placeholder for cleaning up resources once Fastify app is added.
+  delete process.env.__TEST_STARTED_AT;
 });

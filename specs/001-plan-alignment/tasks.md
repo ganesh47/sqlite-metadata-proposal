@@ -44,7 +44,7 @@ description: "Task list for Polyglot Deployment Stack Alignment"
 - [X] T009 Create migration runner + seed scripts (`packages/api/scripts/migrate.ts`, `packages/api/scripts/seed.ts`) that initialize SQLite WAL mode for local/dev containers.
 - [X] T010 Sync the canonical OpenAPI file by copying `specs/001-plan-alignment/contracts/api.yaml` into `packages/api/src/contracts/api.yaml` and add an npm script to regenerate clients.
 - [X] T011 Configure `.github/workflows/stack-build.yml` to run ESLint/Vitest, Ruff/pytest, Maven tests, Spectral, Hadolint, Docker Buildx, and SBOM signing per plan.
-- [ ] T012 Compose the stack in `docker/compose.stack.yml` wiring API, CLI, and connector images with shared SQLite volume + network for local demos.
+- [X] T012 Compose the stack in `docker/compose.stack.yml` wiring API, CLI, and connector images with shared SQLite volume + network for local demos.
 
 **Checkpoint**: Foundation ready – user story implementation can now begin in parallel.
 

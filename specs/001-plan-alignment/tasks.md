@@ -33,7 +33,7 @@ description: "Task list for Polyglot Deployment Stack Alignment"
 - [X] T003 Add Node.js toolchain files (`.nvmrc`, `.npmrc`) and pnpm lockfile at repository root to fix API build versions.
 - [X] T004 Scaffold Python project metadata (`packages/cli/pyproject.toml`, `packages/cli/uv.lock`) with Typer, SQLAlchemy, and Ruff dependencies.
 - [X] T005 Initialize Maven multi-module parent `packages/connectors/java/pom.xml` with submodules `core-client`, `connector-template`, and `examples/http-forwarder`.
-- [ ] T006 Create Docker scaffolding: `docker/api/Dockerfile`, `docker/cli/Dockerfile`, `docker/connector/Dockerfile`, `.dockerignore`, and `docker/api/compose.yml` with stub commands.
+- [X] T006 Create Docker scaffolding: `docker/api/Dockerfile`, `docker/cli/Dockerfile`, `docker/connector/Dockerfile`, `.dockerignore`, and `docker/api/compose.yml` with stub commands.
 
 ## Phase 2: Foundational (Blocking Prerequisites)
 

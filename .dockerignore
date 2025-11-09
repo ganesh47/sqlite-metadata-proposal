@@ -1,0 +1,34 @@
+# General VCS
+.git
+.gitignore
+
+# Node / TypeScript artifacts
+node_modules/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+packages/cli/.venv/
+packages/cli/.ruff_cache/
+packages/cli/.mypy_cache/
+
+# Java artifacts
+target/
+**/target/
+*.class
+
+# Tooling
+.tmp/
+.vscode/
+.idea/
+.DS_Store
+
+# Local data + env
+.env
+.env.*
+*.sqlite
+samples/

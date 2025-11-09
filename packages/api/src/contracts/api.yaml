@@ -1,0 +1,273 @@
+openapi: 3.1.0
+info:
+  title: SQLite Metadata Platform – Core API
+  version: 0.1.0
+  description: >
+    Contracts shared by the TypeScript API, Python CLI, and Java connectors.
+    All responses follow the pagination / error format defined in
+    sqlite-metadata-system.md §4.
+servers:
+  - url: https://api.metadata.local
+paths:
+  /health/ready:
+    get:
+      summary: Readiness probe
+      tags: [health]
+      responses:
+        '200':
+          description: Service ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+  /orgs/{orgId}/nodes:
+    post:
+      summary: Create or update nodes
+      tags: [nodes]
+      parameters:
+        - $ref: '#/components/parameters/OrgId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NodeUpsertRequest'
+      responses:
+        '202':
+          description: Nodes accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkAcknowledge'
+  /orgs/{orgId}/edges:
+    post:
+      summary: Create or update edges
+      tags: [edges]
+      parameters:
+        - $ref: '#/components/parameters/OrgId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EdgeUpsertRequest'
+      responses:
+        '202':
+          description: Edges accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkAcknowledge'
+  /ingest/jobs:
+    post:
+      summary: Start a migration/ingestion job
+      tags: [ingest]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MigrationJobRequest'
+      responses:
+        '201':
+          description: Job created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MigrationJob'
+  /ingest/jobs/{jobId}:
+    get:
+      summary: Fetch migration job status
+      tags: [ingest]
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Job metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MigrationJob'
+  /connectors/{connectorId}/heartbeat:
+    post:
+      summary: Report connector heartbeat & metrics
+      tags: [connectors]
+      parameters:
+        - name: connectorId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectorHeartbeat'
+      responses:
+        '204':
+          description: Heartbeat accepted
+components:
+  parameters:
+    OrgId:
+      name: orgId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Organization identifier, matching auth scope.
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ready]
+        version:
+          type: string
+        sqlite:
+          type: object
+          properties:
+            wal_checkpointed:
+              type: boolean
+            migrations:
+              type: string
+    Pagination:
+      type: object
+      properties:
+        cursor:
+          type: string
+        hasMore:
+          type: boolean
+      required: [cursor, hasMore]
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        code:
+          type: string
+        details:
+          type: array
+          items:
+            type: string
+    NodePayload:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        properties:
+          type: object
+          additionalProperties: true
+        createdBy:
+          type: string
+        updatedBy:
+          type: string
+      required: [id, type, properties]
+    EdgePayload:
+      type: object
+      properties:
+        id:
+          type: string
+        sourceId:
+          type: string
+        targetId:
+          type: string
+        type:
+          type: string
+        properties:
+          type: object
+          additionalProperties: true
+      required: [id, sourceId, targetId, type]
+    NodeUpsertRequest:
+      type: object
+      properties:
+        items:
+          type: array
+          minItems: 1
+          maxItems: 1000
+          items:
+            $ref: '#/components/schemas/NodePayload'
+        jobId:
+          type: string
+      required: [items]
+    EdgeUpsertRequest:
+      type: object
+      properties:
+        items:
+          type: array
+          minItems: 1
+          maxItems: 1000
+          items:
+            $ref: '#/components/schemas/EdgePayload'
+        jobId:
+          type: string
+      required: [items]
+    BulkAcknowledge:
+      type: object
+      properties:
+        accepted:
+          type: integer
+        rejected:
+          type: integer
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorResponse'
+      required: [accepted, rejected]
+    MigrationJobRequest:
+      type: object
+      properties:
+        orgId:
+          type: string
+        source:
+          type: string
+        payload:
+          type: object
+          additionalProperties: true
+      required: [orgId, source]
+    MigrationJob:
+      type: object
+      properties:
+        jobId:
+          type: string
+        orgId:
+          type: string
+        source:
+          type: string
+        status:
+          type: string
+          enum: [queued, running, succeeded, failed]
+        metrics:
+          type: object
+          additionalProperties: true
+        startedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+      required: [jobId, orgId, source, status]
+    ConnectorHeartbeat:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ready, degraded, error]
+        latencyP95Ms:
+          type: number
+        throughputPerSec:
+          type: number
+        lastBatchSize:
+          type: integer
+        observedErrors:
+          type: array
+          items:
+            type: string
+      required: [status]

@@ -1,0 +1,52 @@
+version: '3.9'
+services:
+  sqlite:
+    image: keinos/sqlite3
+    volumes:
+      - data:/workspace
+    command: ["/bin/sh", "-c", "while true; do sleep 3600; done"]
+
+  api:
+    build:
+      context: ..
+      dockerfile: docker/api/Dockerfile
+    image: sqlite-meta-api:dev
+    environment:
+      SQLITE_PATH: /data/metadata.sqlite
+      API_PORT: 8080
+    volumes:
+      - data:/data
+    depends_on:
+      - sqlite
+    ports:
+      - "8080:8080"
+    command: ["bash", "-lc", "echo 'API placeholder – add Fastify entrypoint before running compose stack' && tail -f /dev/null"]
+
+  cli:
+    build:
+      context: ..
+      dockerfile: docker/cli/Dockerfile
+    image: sqlite-meta-cli:dev
+    environment:
+      CLI_API_URL: http://api:8080
+      CLI_ORG_ID: demo-org
+    volumes:
+      - data:/data
+    depends_on:
+      - api
+    command: ["bash", "-lc", "echo 'CLI placeholder – ingest logic to be added later' && tail -f /dev/null"]
+
+  connector:
+    build:
+      context: ..
+      dockerfile: docker/connector/Dockerfile
+    image: sqlite-meta-connector:dev
+    environment:
+      CONNECTOR_API_URL: http://api:8080
+      CONNECTOR_ID: http-forwarder
+    depends_on:
+      - api
+    command: ["bash", "-lc", "echo 'Connector placeholder – add Spring Boot app later' && tail -f /dev/null"]
+
+volumes:
+  data:

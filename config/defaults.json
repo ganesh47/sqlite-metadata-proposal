@@ -1,0 +1,29 @@
+{
+  "api": {
+    "port": 8080,
+    "host": "0.0.0.0",
+    "sqlitePath": "./data/metadata.sqlite",
+    "enableSqliteWal": true,
+    "logLevel": "info",
+    "requestTimeoutMs": 10000,
+    "rateLimitEnabled": true
+  },
+  "cli": {
+    "apiUrl": "http://localhost:8080",
+    "apiToken": "changeme",
+    "orgId": "demo-org",
+    "batchSize": 500,
+    "inputPath": "./fixtures/sample-nodes.json"
+  },
+  "connector": {
+    "connectorId": "http-forwarder",
+    "apiUrl": "http://localhost:8080",
+    "apiToken": "changeme",
+    "heartbeatIntervalSeconds": 30,
+    "batchSize": 500
+  },
+  "registry": {
+    "image": "ghcr.io/ganesh47",
+    "enableSbomSigning": true
+  }
+}

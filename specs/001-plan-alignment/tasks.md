@@ -28,23 +28,23 @@ description: "Task list for Polyglot Deployment Stack Alignment"
 
 **Purpose**: Establish the polyglot workspace, package directories, and Docker scaffolding from the plan.
 
-- [ ] T001 Create initial README stubs documenting scope in `packages/api/README.md`, `packages/cli/README.md`, `packages/connectors/java/README.md`, and `docker/README.md`.
-- [ ] T002 Define root workspace configuration by adding `package.json` + `pnpm-workspace.yaml` at repo root with references to `packages/*`.
-- [ ] T003 Add Node.js toolchain files (`.nvmrc`, `.npmrc`) and pnpm lockfile at repository root to fix API build versions.
-- [ ] T004 Scaffold Python project metadata (`packages/cli/pyproject.toml`, `packages/cli/uv.lock`) with Typer, SQLAlchemy, and Ruff dependencies.
-- [ ] T005 Initialize Maven multi-module parent `packages/connectors/java/pom.xml` with submodules `core-client`, `connector-template`, and `examples/http-forwarder`.
-- [ ] T006 Create Docker scaffolding: `docker/api/Dockerfile`, `docker/cli/Dockerfile`, `docker/connector/Dockerfile`, `.dockerignore`, and `docker/api/compose.yml` with stub commands.
+- [X] T001 Create initial README stubs documenting scope in `packages/api/README.md`, `packages/cli/README.md`, `packages/connectors/java/README.md`, and `docker/README.md`.
+- [X] T002 Define root workspace configuration by adding `package.json` + `pnpm-workspace.yaml` at repo root with references to `packages/*`.
+- [X] T003 Add Node.js toolchain files (`.nvmrc`, `.npmrc`) and pnpm lockfile at repository root to fix API build versions.
+- [X] T004 Scaffold Python project metadata (`packages/cli/pyproject.toml`, `packages/cli/uv.lock`) with Typer, SQLAlchemy, and Ruff dependencies.
+- [X] T005 Initialize Maven multi-module parent `packages/connectors/java/pom.xml` with submodules `core-client`, `connector-template`, and `examples/http-forwarder`.
+- [X] T006 Create Docker scaffolding: `docker/api/Dockerfile`, `docker/cli/Dockerfile`, `docker/connector/Dockerfile`, `.dockerignore`, and `docker/api/compose.yml` with stub commands.
 
 ## Phase 2: Foundational (Blocking Prerequisites)
 
 **Purpose**: Shared infrastructure that MUST be complete before any user story begins (schema, migrations, CI, compose stack).
 
-- [ ] T007 Add shared configuration templates (`.env.example`, `config/defaults.json`) documenting API/CLI/connector env vars per plan in repo root.
-- [ ] T008 Implement Drizzle schema + models from `data-model.md` in `packages/api/src/db/schema.ts` and ensure migrations live under `packages/api/migrations/`.
-- [ ] T009 Create migration runner + seed scripts (`packages/api/scripts/migrate.ts`, `packages/api/scripts/seed.ts`) that initialize SQLite WAL mode for local/dev containers.
-- [ ] T010 Sync the canonical OpenAPI file by copying `specs/001-plan-alignment/contracts/api.yaml` into `packages/api/src/contracts/api.yaml` and add an npm script to regenerate clients.
-- [ ] T011 Configure `.github/workflows/stack-build.yml` to run ESLint/Vitest, Ruff/pytest, Maven tests, Spectral, Hadolint, Docker Buildx, and SBOM signing per plan.
-- [ ] T012 Compose the stack in `docker/compose.stack.yml` wiring API, CLI, and connector images with shared SQLite volume + network for local demos.
+- [X] T007 Add shared configuration templates (`.env.example`, `config/defaults.json`) documenting API/CLI/connector env vars per plan in repo root.
+- [X] T008 Implement Drizzle schema + models from `data-model.md` in `packages/api/src/db/schema.ts` and ensure migrations live under `packages/api/migrations/`.
+- [X] T009 Create migration runner + seed scripts (`packages/api/scripts/migrate.ts`, `packages/api/scripts/seed.ts`) that initialize SQLite WAL mode for local/dev containers.
+- [X] T010 Sync the canonical OpenAPI file by copying `specs/001-plan-alignment/contracts/api.yaml` into `packages/api/src/contracts/api.yaml` and add an npm script to regenerate clients.
+- [X] T011 Configure `.github/workflows/stack-build.yml` to run ESLint/Vitest, Ruff/pytest, Maven tests, Spectral, Hadolint, Docker Buildx, and SBOM signing per plan.
+- [X] T012 Compose the stack in `docker/compose.stack.yml` wiring API, CLI, and connector images with shared SQLite volume + network for local demos.
 
 **Checkpoint**: Foundation ready – user story implementation can now begin in parallel.
 
@@ -58,7 +58,7 @@ description: "Task list for Polyglot Deployment Stack Alignment"
 
 ### Tests for User Story 1 (MUST be written first)
 
-- [ ] T013 [P] [US1] Create Vitest config + helpers in `packages/api/vitest.config.ts` and `packages/api/tests/setup.ts` enforcing coverage + perf thresholds.
+- [X] T013 [P] [US1] Create Vitest config + helpers in `packages/api/vitest.config.ts` and `packages/api/tests/setup.ts` enforcing coverage + perf thresholds.
 - [ ] T014 [P] [US1] Write `packages/api/tests/health.spec.ts` to hit `/health/ready` and assert WAL + migration metadata matches `contracts/api.yaml`.
 - [ ] T015 [P] [US1] Write `packages/api/tests/graph.spec.ts` using Supertest to upsert nodes/edges (success + validation failures) against an in-memory Fastify instance.
 

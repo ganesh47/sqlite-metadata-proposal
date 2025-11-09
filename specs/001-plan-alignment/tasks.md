@@ -41,7 +41,7 @@ description: "Task list for Polyglot Deployment Stack Alignment"
 
 - [X] T007 Add shared configuration templates (`.env.example`, `config/defaults.json`) documenting API/CLI/connector env vars per plan in repo root.
 - [X] T008 Implement Drizzle schema + models from `data-model.md` in `packages/api/src/db/schema.ts` and ensure migrations live under `packages/api/migrations/`.
-- [ ] T009 Create migration runner + seed scripts (`packages/api/scripts/migrate.ts`, `packages/api/scripts/seed.ts`) that initialize SQLite WAL mode for local/dev containers.
+- [X] T009 Create migration runner + seed scripts (`packages/api/scripts/migrate.ts`, `packages/api/scripts/seed.ts`) that initialize SQLite WAL mode for local/dev containers.
 - [ ] T010 Sync the canonical OpenAPI file by copying `specs/001-plan-alignment/contracts/api.yaml` into `packages/api/src/contracts/api.yaml` and add an npm script to regenerate clients.
 - [ ] T011 Configure `.github/workflows/stack-build.yml` to run ESLint/Vitest, Ruff/pytest, Maven tests, Spectral, Hadolint, Docker Buildx, and SBOM signing per plan.
 - [ ] T012 Compose the stack in `docker/compose.stack.yml` wiring API, CLI, and connector images with shared SQLite volume + network for local demos.

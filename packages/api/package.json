@@ -1,0 +1,30 @@
+{
+  "name": "metadata-api",
+  "version": "0.1.0",
+  "description": "Fastify + Drizzle API for the SQLite metadata platform",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm run start:dev",
+    "lint": "eslint src --ext .ts",
+    "test": "vitest run",
+    "migrate": "ts-node --esm ./scripts/migrate.ts",
+    "seed": "ts-node --esm ./scripts/seed.ts",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.4.4",
+    "drizzle-orm": "^0.36.4",
+    "pino": "^9.3.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.10",
+    "@types/node": "^22.8.6",
+    "drizzle-kit": "^0.26.2",
+    "eslint": "^9.14.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5",
+    "vitest": "^2.1.1"
+  }
+}

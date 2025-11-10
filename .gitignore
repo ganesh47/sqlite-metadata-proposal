@@ -45,6 +45,7 @@ target/
 docker-compose.override.yml
 *.sqlite
 tools/
+.pnpm-store/
 
 # Editors
 .idea/

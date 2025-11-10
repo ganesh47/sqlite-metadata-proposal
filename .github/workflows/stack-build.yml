@@ -205,5 +205,5 @@ jobs:
         run: |
           cosign attest \
             --type spdx \
-            --predicate "${{ steps.sbom.outputs.sbom-path }}" \
+            --predicate "sbom-api.json" \
             "${{ env.API_IMAGE }}@${{ steps.build_api.outputs.digest }}"

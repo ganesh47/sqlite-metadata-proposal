@@ -2,15 +2,12 @@ FROM python:3.12-slim AS runtime
 
 ENV PYTHONUNBUFFERED=1 \
     UV_LINK_MODE=copy \
-    UV_COMPILE_BYTECODE=1
+    UV_COMPILE_BYTECODE=1 \
+    UV_VERSION=0.4.18
 
 WORKDIR /srv/cli
 
-RUN apt-get update \
-    && apt-get install --no-install-recommends -y curl \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN pip install --no-cache-dir uv
+RUN pip install --no-cache-dir "uv==${UV_VERSION}"
 
 COPY packages/cli/pyproject.toml ./pyproject.toml
 COPY packages/cli/uv.lock ./uv.lock

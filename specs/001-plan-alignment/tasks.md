@@ -124,7 +124,7 @@ description: "Task list for Polyglot Deployment Stack Alignment"
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T037 Update `sqlite-metadata-system.md` §12 (Next Steps) and `docs/process.md` to reflect the approved TypeScript/Python/Java + Docker workflow.
+- [X] T037 Update `sqlite-metadata-system.md` §12 (Next Steps) and `docs/process.md` to reflect the approved TypeScript/Python/Java + Docker workflow.
 - [ ] T038 Add SBOM + signing automation scripts in `scripts/publish-images.sh` and document usage in `docker/README.md`.
 - [ ] T039 Capture release notes + demo procedures in `docs/notes/$(date).md` summarizing image locations, perf benchmarks, and outstanding risks.
 

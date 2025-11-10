@@ -5,8 +5,9 @@ This repository tracks the evolution of the **SQLite Metadata System** proposal.
 
 ## Branching Strategy
 - Default branch: `main`.
-- Create a feature branch per task: `docs/<topic>-<issue#>` or `chore/<task>-<issue#>`.
-- Keep branches short-lived. Rebase onto `main` before opening a pull request (`git pull --rebase origin main`).
+- Create a feature branch per task using the spec prefix so `.specify` tooling can locate the right documents: `NNN-short-name` (e.g., `001-t037-docs`). One branch == one GitHub issue.
+- Keep branches short-lived. Rebase onto `main` (`git pull --rebase origin main`) before opening a pull request and run `.specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks` to confirm the branch is tied to the correct feature directory.
+- Every work session starts by syncing the task/checklist context from `specs/<NNN-...>/tasks.md` and marking completed tasks `[X]` in that file and in the associated GitHub issue.
 
 ## Commit Guidelines
 - Use conventional prefixes: `docs:`, `feat:`, `chore:`, `ci:`, `refactor:`.
@@ -19,8 +20,12 @@ This repository tracks the evolution of the **SQLite Metadata System** proposal.
 4. Move the card on the project board from **Backlog** → **Selected** → **In Progress** → **Review** → **Done**.
 
 ## Pull Request Workflow
-- Reference the associated issue in the PR description (`Closes #X`).
-- Ensure lint and link-check workflows pass before requesting review.
+- Reference the associated issue and spec task in the PR description (`Closes #X`, cites `T0YY`).
+- Ensure the polyglot validation commands stay green before requesting review:
+  - API: `cd packages/api && pnpm lint && pnpm vitest run`
+  - CLI: `cd packages/cli && uv run ruff check . && uv run pytest`
+  - Connectors: `cd packages/connectors/java && mvn --batch-mode verify`
+  - Optional but encouraged: `docker compose -f docker/api/compose.yml up --build --detach` smoke test, `docker build` for CLI/connector, and SBOM/signing scripts.
 - At least one review (human or delegated agent) is required before merging.
 - Use squash merge to keep history clean; delete the branch once merged.
 
@@ -46,8 +51,17 @@ This repository tracks the evolution of the **SQLite Metadata System** proposal.
 - `docs/notes/`: dated research logs (`YYYY-MM-DD.md`).
 - `docs/decisions/`: architecture decision records (ADR) when decisions stabilize.
 
+## Polyglot Build & Validation Commands
+
+| Scope | Command(s) | Notes |
+|-------|------------|-------|
+| API (TypeScript) | `cd packages/api && pnpm lint && pnpm vitest run` | Uses Node.js 20 + Fastify + Drizzle; relies on `.pnpm-store` inside the repo so CI runners have write access. |
+| CLI (Python) | `cd packages/cli && uv run ruff check . && uv run pytest` | Typer/SQLAlchemy stack; keep fixtures in `packages/cli/tests`. |
+| Connectors (Java) | `cd packages/connectors/java && mvn --batch-mode verify` | Java 21 + Spring Boot template with Spotless/Checkstyle. |
+| Docker images | `docker build -f docker/api/Dockerfile .` etc. | API/CLI/connector images must produce SBOM + signed artifacts; scripts live under `docker/` and `scripts/`. |
+
 ## Automation
-- Linting: Markdown lint on pull requests.
+- `stack-build.yml` runs pnpm/uv/maven lint+test suites, Hadolint, Spectral, Docker Buildx, and SBOM signing for every PR and merge to `main`.
 - Link checks: Lychee link checker nightly and on PRs touching docs.
 - Proposal snapshot: build & archive HTML/PDF on merge to `main` (planned).
 - Spec sync: `Sync Spec Tasks` workflow (weekly and on demand) reads `specs/tasks.json`
@@ -60,7 +74,7 @@ This repository tracks the evolution of the **SQLite Metadata System** proposal.
 
 ## Getting Started Checklist
 1. Clone the repo and run `gh repo sync` if needed.
-2. Read the open issues in the project board.
-3. Pick an issue, self-assign, and move it to **Selected**.
-4. Create a branch, make changes, and open a PR using the template.
-5. Ensure workflows pass and request review.
+2. Read the open issues in the project board and pick the next dated spec task.
+3. Create a feature branch named `NNN-short-name`, run the `.specify/scripts/bash/check-prerequisites.sh` command, and review `specs/<NNN-...>/plan.md` + `tasks.md`.
+4. Implement the task following the spec-driven workflow (tests first, then implementation, then docs), updating checklists and issues as you finish checkpoints.
+5. Run the polyglot validation commands, open a PR with references, and keep CI green before/after merge.

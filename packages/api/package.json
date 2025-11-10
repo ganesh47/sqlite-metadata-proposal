@@ -10,14 +10,17 @@
     "test": "vitest run",
     "migrate": "ts-node --esm ./scripts/migrate.ts",
     "seed": "ts-node --esm ./scripts/seed.ts",
+    "start:dev": "ts-node --esm src/index.ts",
     "start": "node dist/index.js",
     "openapi:sync": "cp ../../specs/001-plan-alignment/contracts/api.yaml src/contracts/api.yaml",
     "openapi:client": "openapi-generator-cli generate -i src/contracts/api.yaml -g typescript-fetch -o ../cli/src/client --additional-properties=supportsES6=true,npmName=metadata-client"
   },
   "dependencies": {
-    "fastify": "^4.28.1",
+    "@fastify/cors": "^9.0.1",
     "better-sqlite3": "^9.4.4",
     "drizzle-orm": "^0.36.4",
+    "fastify": "^4.28.1",
+    "fastify-plugin": "5.1.0",
     "pino": "^9.3.1",
     "zod": "^3.23.8"
   },

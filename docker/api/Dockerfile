@@ -1,16 +1,29 @@
 # syntax=docker/dockerfile:1.7
-FROM node:20-bookworm-slim AS base
+ARG NODE_VERSION=20.19.5
+
+FROM node:${NODE_VERSION}-bookworm-slim AS build
+ENV PNPM_HOME=/root/.local/share/pnpm
+ENV PATH=$PNPM_HOME:$PATH
+RUN corepack enable
+
+WORKDIR /workspace
+
+# Install only the dependencies needed for the API workspace.
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+COPY packages/api/package.json packages/api/package.json
+RUN pnpm install --frozen-lockfile --filter metadata-api...
+
+# Copy the remaining workspace now that dependencies are cached.
+COPY packages packages
+
+RUN pnpm --filter metadata-api run build
+RUN pnpm deploy --filter metadata-api --prod /opt/app
+
+FROM node:${NODE_VERSION}-bookworm-slim AS runner
 ENV NODE_ENV=production
 WORKDIR /srv/api
 
-# Enable Corepack so pnpm is available when we add the API implementation.
-RUN corepack enable pnpm && corepack pnpm --version
+COPY --from=build /opt/app .
 
-# Copy workspace manifests now so layer caching works once app code is in place.
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
-
-# Placeholder install step – this will be replaced with `pnpm install --filter packages/api...`
-RUN echo "API Dockerfile scaffold ready. Add pnpm install/build steps during US1." > /srv/api/README.docker
-
-# Final stage simply keeps the container alive until the Fastify app is implemented.
-CMD ["bash", "-lc", "echo 'API container placeholder – implement pnpm build/start during US1' && tail -f /dev/null"]
+EXPOSE 8080
+CMD ["node", "dist/index.js"]

@@ -11,7 +11,10 @@
 
 ```bash
 # API
-docker build -f docker/api/Dockerfile -t ghcr.io/ganesh47/sqlite-meta-api:dev .
+docker build \
+  --ignorefile docker/api/.dockerignore \
+  -f docker/api/Dockerfile \
+  -t ghcr.io/ganesh47/sqlite-meta-api:dev .
 
 # Python CLI
 docker build -f docker/cli/Dockerfile -t ghcr.io/ganesh47/sqlite-meta-cli:dev .
@@ -26,7 +29,18 @@ Each Dockerfile emits an SBOM and signature (see `docker/README.md`) and keeps c
 
 ```bash
 docker compose -f docker/api/compose.yml up -d
-curl http://localhost:8080/health/ready
+
+# Default env vars: API_PORT=8080, API_HOST=0.0.0.0, SQLITE_PATH=/var/lib/sqlite/metadata.sqlite
+curl http://localhost:8080/health/ready | jq
+
+# Happy-path node + edge requests
+curl -X POST http://localhost:8080/orgs/demo-org/nodes \
+  -H 'content-type: application/json' \
+  -d '{"items":[{"id":"node-1","type":"workspace","properties":{},"createdBy":"cli"}]}'
+
+curl -X POST http://localhost:8080/orgs/demo-org/edges \
+  -H 'content-type: application/json' \
+  -d '{"items":[{"id":"edge-1","sourceId":"node-1","targetId":"node-2","type":"link","properties":{}}]}'
 ```
 
 The readiness payload must match `contracts/api.yaml#HealthResponse`. Pino logs show latency histograms to validate Principle IV budgets.
@@ -36,6 +50,8 @@ The readiness payload must match `contracts/api.yaml#HealthResponse`. Pino logs 
 ```bash
 docker run --rm \
   -v $(pwd)/samples/org1.sqlite:/data/db.sqlite \
+  -e API_URL=http://host.docker.internal:8080 \
+  -e API_TOKEN=$API_TOKEN \
   ghcr.io/ganesh47/sqlite-meta-cli:dev \
   ingest --org org1 --file fixtures/sample-nodes.json
 
@@ -60,3 +76,4 @@ Connector heartbeats call `POST /connectors/{connectorId}/heartbeat` every 30 
 1. Run `pnpm spectral lint specs/001-plan-alignment/contracts/api.yaml`.
 2. Execute `pytest`, `vitest`, and `mvn test` to ensure all suites pass before pushing.
 3. Update `sqlite-metadata-system.md` §12 and `docs/process.md` with any workflow changes introduced by this stack.
+4. Review the API logs for `Performance budget exceeded` messages from `packages/api/src/plugins/metrics.ts`; any warnings indicate regressions against the latency/RSS contracts.

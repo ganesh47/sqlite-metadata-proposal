@@ -251,12 +251,26 @@
 
 ## 12. Next Steps
 
-1. Approve the scope and target stack (Fastify + TypeScript + Drizzle
-   recommended).
-2. Set up the repository scaffold (`packages/api`, `packages/cli`, `apps/web`).
-3. Author the migration tool for current datasets (YouTube8M ingestion to
-   SQLite).
-4. Begin Phase 1 implementation with iterative demos every sprint.
+1. **Ratify the polyglot delivery stack.** Lock the Fastify + TypeScript +
+   Drizzle API on Node.js 20, the Typer/SQLAlchemy CLI on Python 3.12, and the
+   Spring Boot connector template on Java 21. Every artifact must ship as a
+   Docker image (API, CLI, connector) with SBOM + signing metadata and be
+   referenced from the proposal.
+2. **Finish the repo + CI scaffolding.** Keep `packages/api`, `packages/cli`,
+   and `packages/connectors/java` as the primary workspaces and maintain the
+   Docker build context under `docker/`. The `stack-build` workflow must run
+   `pnpm lint && pnpm test`, `uv run ruff check . && uv run pytest`, `mvn
+   --batch-mode verify`, Hadolint, Spectral, and Docker Buildx pushes so every
+   surface stays green.
+3. **Document the ingestion & migration story.** Capture the CLI migration
+   process (e.g., how YouTube8M is transformed into SQLite) in
+   `docs/quickstart.md`, enumerate dataset ergonomics, and keep
+   `sqlite-metadata-system.md` + `docs/process.md` aligned with the approved
+   TypeScript/Python/Java + Docker workflow.
+4. **Schedule iterative demos.** Operate Phase 1 as a sprint cadence that
+   exercises the API compose stack, CLI ingestion runs, and connector heartbeats
+   so stakeholders can review image digests, performance budgets, and outstanding
+   risks.
 
 Prepared as a forward-looking plan that leverages lessons from the Cloudflare
 implementation while enabling a broader deployment footprint.

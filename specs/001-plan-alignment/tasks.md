@@ -64,13 +64,13 @@ description: "Task list for Polyglot Deployment Stack Alignment"
 
 ### Implementation for User Story 1
 
-- [ ] T016 [US1] Implement Fastify server bootstrap with Pino + CORS plugins in `packages/api/src/server.ts` and wire graceful shutdown hooks.
-- [ ] T017 [US1] Add Drizzle data access + repository layer in `packages/api/src/services/graph-service.ts` consuming `schema.ts`.
-- [ ] T018 [US1] Implement node/edge routes + validators per contract in `packages/api/src/routes/graph.ts` and register them in `packages/api/src/index.ts`.
-- [ ] T019 [US1] Implement `/health/ready` controller in `packages/api/src/routes/health.ts` that checks migration status + SQLite pragmas.
-- [ ] T020 [US1] Integrate latency + RSS metrics (Pino serializers, histogram export) in `packages/api/src/plugins/metrics.ts` respecting Principle IV budgets.
-- [ ] T021 [US1] Harden documentation by updating `packages/api/README.md` and `specs/001-plan-alignment/quickstart.md` with env vars, curl examples, and failure modes.
-- [ ] T022 [US1] Produce the multi-stage API image by finishing `docker/api/Dockerfile` + `docker/api/.dockerignore` and document build/push commands in `docker/README.md`.
+- [X] T016 [US1] Implement Fastify server bootstrap with Pino + CORS plugins in `packages/api/src/server.ts` and wire graceful shutdown hooks.
+- [X] T017 [US1] Add Drizzle data access + repository layer in `packages/api/src/services/graph-service.ts` consuming `schema.ts`.
+- [X] T018 [US1] Implement node/edge routes + validators per contract in `packages/api/src/routes/graph.ts` and register them in `packages/api/src/index.ts`.
+- [X] T019 [US1] Implement `/health/ready` controller in `packages/api/src/routes/health.ts` that checks migration status + SQLite pragmas.
+- [X] T020 [US1] Integrate latency + RSS metrics (Pino serializers, histogram export) in `packages/api/src/plugins/metrics.ts` respecting Principle IV budgets.
+- [X] T021 [US1] Harden documentation by updating `packages/api/README.md` and `specs/001-plan-alignment/quickstart.md` with env vars, curl examples, and failure modes.
+- [X] T022 [US1] Produce the multi-stage API image by finishing `docker/api/Dockerfile` + `docker/api/.dockerignore` and document build/push commands in `docker/README.md`.
 
 **Checkpoint**: User Story 1 is independently deployable as the MVP when tests + Docker image succeed.
 

@@ -1,32 +1,39 @@
-import Fastify from "fastify";
 import { beforeAll, afterAll, describe, expect, it } from "vitest";
-import { buildHealthPayload } from "../src/routes/health";
+import type { FastifyInstance } from "fastify";
+import { mkdtempSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { buildServer } from "../src/server";
+import type { HealthPayload } from "../src/routes/health";
 
 describe("GET /health/ready", () => {
-  const app = Fastify();
+  let app: FastifyInstance;
+  const sqlitePath = join(mkdtempSync(join(tmpdir(), "metadata-health-")), "db.sqlite");
 
   beforeAll(async () => {
-    app.get("/health/ready", async () => buildHealthPayload());
+    app = await buildServer({ sqlitePath });
     await app.ready();
   });
 
   afterAll(async () => {
-    await app.close();
+    if (app) {
+      await app.close();
+    }
   });
 
   it("returns readiness payload that matches the contract", async () => {
     const response = await app.inject({
       method: "GET",
-      url: "/health/ready"
+      url: "/health/ready",
     });
 
     expect(response.statusCode).toBe(200);
-    const body = response.json() as ReturnType<typeof buildHealthPayload>;
+    const body = response.json() as HealthPayload;
     expect(body.status).toBe("ready");
     expect(typeof body.version).toBe("string");
     expect(body.sqlite).toMatchObject({
-      walCheckpointed: expect.any(Boolean),
-      migrations: expect.any(String)
+      wal_checkpointed: true,
+      migrations: "applied",
     });
   });
 });

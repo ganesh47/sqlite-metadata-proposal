@@ -49,8 +49,8 @@ jobs:
 
       - name: ESLint & Vitest (API)
         run: |
-          pnpm --filter metadata-api lint --if-present || echo \"lint skipped\"
-          pnpm --filter metadata-api test --if-present || echo \"tests skipped\"
+          pnpm --filter metadata-api lint --if-present || echo "lint skipped"
+          pnpm --filter metadata-api test --if-present || echo "tests skipped"
 
       - name: Setup Python tooling
         run: python -m pip install --upgrade pip
@@ -125,6 +125,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     permissions:
       contents: read
+      packages: write
       id-token: write
     steps:
       - uses: actions/checkout@v4
@@ -156,8 +157,8 @@ jobs:
           password: ${{ secrets.GHCR_PAT }}
 
       - name: Docker metadata
-        id: meta
         if: steps.ghcr_pat.outputs.missing == 'false'
+        id: meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.API_IMAGE }}
@@ -166,8 +167,8 @@ jobs:
             type=sha,prefix=sha-
 
       - name: Build and push API image
-        id: build_api
         if: steps.ghcr_pat.outputs.missing == 'false'
+        id: build_api
         uses: docker/build-push-action@v5
         with:
           file: docker/api/Dockerfile
@@ -176,8 +177,8 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Generate SBOM (API release)
-        id: sbom
         if: steps.ghcr_pat.outputs.missing == 'false'
+        id: sbom
         uses: anchore/sbom-action@v0
         with:
           image: ${{ env.API_IMAGE }}@${{ steps.build_api.outputs.digest }}

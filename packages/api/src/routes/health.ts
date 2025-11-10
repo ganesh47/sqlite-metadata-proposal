@@ -41,9 +41,20 @@ export const buildHealthPayload = (sqlite: SqliteDatabase): HealthPayload => ({
   },
 });
 
+const WAL_CHECKPOINT_PRAGMA = "wal_checkpoint(PASSIVE)";
+
 const ensureWalCheckpoint = (sqlite: SqliteDatabase): boolean => {
-  const journalMode = sqlite.pragma("journal_mode", { simple: true });
-  return typeof journalMode === "string" && journalMode.toLowerCase() === "wal";
+  try {
+    const journalMode = sqlite.pragma("journal_mode", { simple: true });
+    if (typeof journalMode !== "string" || journalMode.toLowerCase() !== "wal") {
+      return false;
+    }
+
+    const busyFrames = sqlite.pragma(WAL_CHECKPOINT_PRAGMA, { simple: true });
+    return typeof busyFrames === "number" ? busyFrames === 0 : false;
+  } catch {
+    return false;
+  }
 };
 
 const verifyMigrations = (sqlite: SqliteDatabase): string => {

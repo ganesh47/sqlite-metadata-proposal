@@ -14,7 +14,7 @@ COPY packages/cli/uv.lock ./uv.lock
 COPY packages/cli/README.md ./README.md
 COPY packages/cli/src ./src
 
-RUN uv pip install --system --frozen .
+RUN uv pip install --system .
 
 COPY packages/cli/scripts/docker-entrypoint.sh /usr/local/bin/metadata-cli-entrypoint
 RUN chmod +x /usr/local/bin/metadata-cli-entrypoint

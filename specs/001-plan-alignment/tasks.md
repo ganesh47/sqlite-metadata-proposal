@@ -84,16 +84,16 @@ description: "Task list for Polyglot Deployment Stack Alignment"
 
 ### Tests for User Story 2
 
-- [ ] T023 [P] [US2] Configure pytest + Ruff by adding `packages/cli/pytest.ini`, `packages/cli/tests/conftest.py`, and failing fixtures that spin up temp SQLite files.
-- [ ] T024 [P] [US2] Write regression tests in `packages/cli/tests/test_ingest_sample.py` covering success ingest, validation failure, and rollback semantics.
+- [X] T023 [P] [US2] Configure pytest + Ruff by adding `packages/cli/pytest.ini`, `packages/cli/tests/conftest.py`, and failing fixtures that spin up temp SQLite files.
+- [X] T024 [P] [US2] Write regression tests in `packages/cli/tests/test_ingest_sample.py` covering success ingest, validation failure, and rollback semantics.
 
 ### Implementation for User Story 2
 
-- [ ] T025 [US2] Implement Typer entrypoint + CLI options in `packages/cli/src/main.py`, including env overrides for API URL, org, and batch size.
-- [ ] T026 [US2] Build ingestion + validation pipeline (`packages/cli/src/services/ingest.py`) that maps datasets into GraphNode/GraphEdge models, enforces schema, and writes audit fields.
-- [ ] T027 [US2] Add migration job tracker + persistence helpers in `packages/cli/src/db/migrations.py` aligning with `MigrationJob` entity.
-- [ ] T028 [US2] Stream structured logs + throughput metrics from the CLI in `packages/cli/src/utils/logging.py`, honoring `<5s` batch SLA and `<256MB` RSS budget.
-- [ ] T029 [US2] Package CLI Docker image by finalizing `docker/cli/Dockerfile` and entry script `packages/cli/scripts/docker-entrypoint.sh`, plus update `packages/cli/README.md`.
+- [X] T025 [US2] Implement Typer entrypoint + CLI options in `packages/cli/src/main.py`, including env overrides for API URL, org, and batch size.
+- [X] T026 [US2] Build ingestion + validation pipeline (`packages/cli/src/services/ingest.py`) that maps datasets into GraphNode/GraphEdge models, enforces schema, and writes audit fields.
+- [X] T027 [US2] Add migration job tracker + persistence helpers in `packages/cli/src/db/migrations.py` aligning with `MigrationJob` entity.
+- [X] T028 [US2] Stream structured logs + throughput metrics from the CLI in `packages/cli/src/utils/logging.py`, honoring `<5s` batch SLA and `<256MB` RSS budget.
+- [X] T029 [US2] Package CLI Docker image by finalizing `docker/cli/Dockerfile` and entry script `packages/cli/scripts/docker-entrypoint.sh`, plus update `packages/cli/README.md`.
 
 **Checkpoint**: CLI can ingest data and be distributed as a standalone Docker image, independent of other user stories.
 

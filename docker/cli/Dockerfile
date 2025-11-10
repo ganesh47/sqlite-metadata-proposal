@@ -1,7 +1,23 @@
-FROM python:3.12-slim AS base
+FROM python:3.12-slim AS runtime
+
+ENV PYTHONUNBUFFERED=1 \
+    UV_LINK_MODE=copy \
+    UV_COMPILE_BYTECODE=1 \
+    UV_VERSION=0.4.18
+
 WORKDIR /srv/cli
 
-COPY packages/cli/pyproject.toml ./
-RUN echo "CLI Dockerfile scaffold ready. Add Typer sources + entrypoint later." > README.docker
+RUN pip install --no-cache-dir "uv==${UV_VERSION}"
 
-CMD ["bash", "-lc", "echo 'CLI container placeholder – add Typer code before publishing image' && tail -f /dev/null"]
+COPY packages/cli/pyproject.toml ./pyproject.toml
+COPY packages/cli/uv.lock ./uv.lock
+COPY packages/cli/README.md ./README.md
+COPY packages/cli/src ./src
+
+RUN uv pip install --system .
+
+COPY packages/cli/scripts/docker-entrypoint.sh /usr/local/bin/metadata-cli-entrypoint
+RUN chmod +x /usr/local/bin/metadata-cli-entrypoint
+
+ENTRYPOINT ["/usr/local/bin/metadata-cli-entrypoint"]
+CMD ["ingest", "--help"]

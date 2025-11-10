@@ -1,56 +1,46 @@
-import Fastify from "fastify";
 import request from "supertest";
 import { beforeAll, afterAll, describe, expect, it } from "vitest";
+import type { FastifyInstance } from "fastify";
+import { mkdtempSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { buildServer } from "../src/server";
 
-const buildGraphServer = () => {
-  const app = Fastify();
+const createNodes = async (app: FastifyInstance) => {
+  const payload = {
+    items: [
+      {
+        id: "node-1",
+        type: "workspace",
+        properties: {},
+      },
+      {
+        id: "node-2",
+        type: "workspace",
+        properties: {},
+      },
+    ],
+  };
 
-  app.post("/orgs/:orgId/nodes", async (req, reply) => {
-    const body = req.body as { items?: Array<Record<string, unknown>> };
-    if (!body.items || !Array.isArray(body.items) || body.items.length === 0) {
-      return reply.status(400).send({
-        error: "Bad Request",
-        code: "INVALID_NODE_UPSERT",
-        details: ["items array required"]
-      });
-    }
-
-    return reply.status(202).send({
-      accepted: body.items.length,
-      rejected: 0,
-      errors: []
-    });
-  });
-
-  app.post("/orgs/:orgId/edges", async (req, reply) => {
-    const body = req.body as { items?: Array<Record<string, unknown>> };
-    if (!body.items || !Array.isArray(body.items) || body.items.length === 0) {
-      return reply.status(400).send({
-        error: "Bad Request",
-        code: "INVALID_EDGE_UPSERT",
-        details: ["items array required"]
-      });
-    }
-
-    return reply.status(202).send({
-      accepted: body.items.length,
-      rejected: 0,
-      errors: []
-    });
-  });
-
-  return app;
+  await request(app.server)
+    .post("/orgs/demo-org/nodes")
+    .send(payload)
+    .set("content-type", "application/json");
 };
 
 describe("graph contract", () => {
-  const app = buildGraphServer();
+  let app: FastifyInstance;
+  const sqlitePath = join(mkdtempSync(join(tmpdir(), "metadata-graph-")), "db.sqlite");
 
   beforeAll(async () => {
+    app = await buildServer({ sqlitePath });
     await app.ready();
   });
 
   afterAll(async () => {
-    await app.close();
+    if (app) {
+      await app.close();
+    }
   });
 
   it("accepts valid node upserts", async () => {
@@ -88,6 +78,8 @@ describe("graph contract", () => {
   });
 
   it("accepts valid edge upserts", async () => {
+    await createNodes(app);
+
     const payload = {
       items: [
         {

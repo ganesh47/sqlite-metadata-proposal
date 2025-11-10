@@ -1,0 +1,22 @@
+# Reduce context size when building the API image from the repo root with
+# `docker build --ignorefile docker/api/.dockerignore -f docker/api/Dockerfile .`
+
+**/.git
+**/.specify
+**/.pnpm-store
+**/.vite*
+**/.vitest
+**/node_modules
+**/tests
+**/*.sqlite
+
+docker/cli
+docker/connector
+packages/cli
+packages/connectors
+
+docs/
+specs/
+samples/
+
+*.md

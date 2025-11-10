@@ -1,0 +1,57 @@
+# General noise
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Monorepo docs + config not needed for publish
+.github/
+.specify/
+specs/
+docs/
+docker/
+tools/
+AGENTS.md
+
+# Node / TypeScript artifacts
+node_modules/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+.pnpm-store/
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+
+# Java artifacts
+target/
+**/target/
+*.class
+*.jar
+*.war
+*.ear
+.gradle/
+
+# Tests & local data
+tests/
+samples/
+*.sqlite
+
+# Editors
+.idea/
+.vscode/
+.codex/

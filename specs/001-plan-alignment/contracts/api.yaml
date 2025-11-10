@@ -6,12 +6,29 @@ info:
     Contracts shared by the TypeScript API, Python CLI, and Java connectors.
     All responses follow the pagination / error format defined in
     sqlite-metadata-system.md §4.
+  contact:
+    name: SQLite Metadata Platform Team
+    url: https://github.com/ganesh47/sqlite-metadata-proposal
+    email: support@metadata.local
+tags:
+  - name: health
+    description: Health and readiness probe endpoints.
+  - name: nodes
+    description: Bulk node ingestion APIs.
+  - name: edges
+    description: Bulk edge ingestion APIs.
+  - name: ingest
+    description: Migration job lifecycle endpoints for CLI runs.
+  - name: connectors
+    description: Connector management and heartbeat reporting.
 servers:
   - url: https://api.metadata.local
 paths:
   /health/ready:
     get:
       summary: Readiness probe
+      description: Returns the API build metadata plus SQLite WAL/migration readiness checks.
+      operationId: getHealthReady
       tags: [health]
       responses:
         '200':
@@ -23,6 +40,8 @@ paths:
   /orgs/{orgId}/nodes:
     post:
       summary: Create or update nodes
+      description: Accepts batches of GraphNode payloads and persists them idempotently for the org.
+      operationId: upsertNodes
       tags: [nodes]
       parameters:
         - $ref: '#/components/parameters/OrgId'
@@ -42,6 +61,8 @@ paths:
   /orgs/{orgId}/edges:
     post:
       summary: Create or update edges
+      description: Accepts batches of GraphEdge payloads and validates referenced nodes before insert.
+      operationId: upsertEdges
       tags: [edges]
       parameters:
         - $ref: '#/components/parameters/OrgId'
@@ -61,6 +82,8 @@ paths:
   /ingest/jobs:
     post:
       summary: Start a migration/ingestion job
+      description: Creates a MigrationJob record that tracks dataset ingestion progress and metrics.
+      operationId: createMigrationJob
       tags: [ingest]
       requestBody:
         required: true
@@ -78,6 +101,8 @@ paths:
   /ingest/jobs/{jobId}:
     get:
       summary: Fetch migration job status
+      description: Retrieves the latest status, timestamps, and metrics for a previously created job.
+      operationId: getMigrationJob
       tags: [ingest]
       parameters:
         - name: jobId
@@ -95,6 +120,8 @@ paths:
   /connectors/{connectorId}/heartbeat:
     post:
       summary: Report connector heartbeat & metrics
+      description: Allows a connector deployment to report liveness information and resource metrics.
+      operationId: reportConnectorHeartbeat
       tags: [connectors]
       parameters:
         - name: connectorId

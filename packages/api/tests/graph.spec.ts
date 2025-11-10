@@ -1,6 +1,9 @@
 import request from "supertest";
 import { beforeAll, afterAll, describe, expect, it } from "vitest";
 import type { FastifyInstance } from "fastify";
+import { mkdtempSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { buildServer } from "../src/server";
 
 const createNodes = async (app: FastifyInstance) => {
@@ -27,14 +30,17 @@ const createNodes = async (app: FastifyInstance) => {
 
 describe("graph contract", () => {
   let app: FastifyInstance;
+  const sqlitePath = join(mkdtempSync(join(tmpdir(), "metadata-graph-")), "db.sqlite");
 
   beforeAll(async () => {
-    app = await buildServer({ sqlitePath: process.env.SQLITE_PATH });
+    app = await buildServer({ sqlitePath });
     await app.ready();
   });
 
   afterAll(async () => {
-    await app.close();
+    if (app) {
+      await app.close();
+    }
   });
 
   it("accepts valid node upserts", async () => {

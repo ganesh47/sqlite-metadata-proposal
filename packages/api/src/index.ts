@@ -1,4 +1,4 @@
-import { buildServer } from "./server";
+import { buildServer } from "./server.js";
 
 const start = async () => {
   const port = Number(process.env.API_PORT ?? 8080);

@@ -16,8 +16,8 @@ RUN pnpm install --frozen-lockfile --filter metadata-api...
 # Copy the remaining workspace now that dependencies are cached.
 COPY packages packages
 
-RUN pnpm --filter metadata-api run build
-RUN pnpm deploy --filter metadata-api --prod /opt/app
+RUN pnpm --filter metadata-api run build && \
+    pnpm deploy --filter metadata-api --prod /opt/app
 
 FROM node:${NODE_VERSION}-bookworm-slim AS runner
 ENV NODE_ENV=production

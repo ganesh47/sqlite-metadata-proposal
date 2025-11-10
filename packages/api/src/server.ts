@@ -5,11 +5,11 @@ import Database from "better-sqlite3";
 import { mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { drizzle } from "drizzle-orm/better-sqlite3";
-import { graphRoutes } from "./routes/graph";
-import { healthRoutes } from "./routes/health";
-import { GraphService } from "./services/graph-service";
-import { applyMigrations } from "./utils/migrations";
-import { metricsPlugin } from "./plugins/metrics";
+import { graphRoutes } from "./routes/graph.js";
+import { healthRoutes } from "./routes/health.js";
+import { GraphService } from "./services/graph-service.js";
+import { applyMigrations } from "./utils/migrations.js";
+import { metricsPlugin } from "./plugins/metrics.js";
 
 export interface ServerOptions {
   sqlitePath?: string;

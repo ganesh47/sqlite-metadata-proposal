@@ -10,6 +10,7 @@
     "test": "vitest run",
     "migrate": "ts-node --esm ./scripts/migrate.ts",
     "seed": "ts-node --esm ./scripts/seed.ts",
+    "build": "tsc -p tsconfig.json",
     "start:dev": "ts-node --esm src/index.ts",
     "start": "node dist/index.js",
     "openapi:sync": "cp ../../specs/001-plan-alignment/contracts/api.yaml src/contracts/api.yaml",

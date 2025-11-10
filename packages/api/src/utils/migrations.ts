@@ -1,10 +1,12 @@
 import { readdirSync, readFileSync, existsSync } from "node:fs";
 import { resolve, join } from "node:path";
-import type Database from "better-sqlite3";
+import type BetterSqlite3 from "better-sqlite3";
 
 const DEFAULT_MIGRATIONS_DIR = resolve(process.cwd(), "migrations");
 
-export const applyMigrations = (sqlite: Database, migrationsDir = DEFAULT_MIGRATIONS_DIR) => {
+type SqliteDatabase = BetterSqlite3.Database;
+
+export const applyMigrations = (sqlite: SqliteDatabase, migrationsDir = DEFAULT_MIGRATIONS_DIR) => {
   if (!existsSync(migrationsDir)) {
     return;
   }

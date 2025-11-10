@@ -1,6 +1,6 @@
 import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { sql } from "drizzle-orm";
-import { graphNodes, graphEdges } from "../db/schema";
+import { graphNodes, graphEdges } from "../db/schema.js";
 
 export interface MutationContext {
   jobId?: string;

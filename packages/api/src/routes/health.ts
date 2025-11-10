@@ -1,4 +1,4 @@
-import type Database from "better-sqlite3";
+import type BetterSqlite3 from "better-sqlite3";
 import type { FastifyPluginAsync } from "fastify";
 
 export interface SqliteHealth {
@@ -12,8 +12,10 @@ export interface HealthPayload {
   sqlite: SqliteHealth;
 }
 
+type SqliteDatabase = BetterSqlite3.Database;
+
 export interface HealthRouteOptions {
-  sqlite: Database;
+  sqlite: SqliteDatabase;
 }
 
 export const healthRoutes: FastifyPluginAsync<HealthRouteOptions> = async (fastify, opts) => {
@@ -30,7 +32,7 @@ export const healthRoutes: FastifyPluginAsync<HealthRouteOptions> = async (fasti
 
 const getVersion = () => process.env.npm_package_version ?? "0.0.0-dev";
 
-export const buildHealthPayload = (sqlite: Database): HealthPayload => ({
+export const buildHealthPayload = (sqlite: SqliteDatabase): HealthPayload => ({
   status: "ready",
   version: getVersion(),
   sqlite: {
@@ -39,18 +41,18 @@ export const buildHealthPayload = (sqlite: Database): HealthPayload => ({
   },
 });
 
-const ensureWalCheckpoint = (sqlite: Database): boolean => {
+const ensureWalCheckpoint = (sqlite: SqliteDatabase): boolean => {
   const journalMode = sqlite.pragma("journal_mode", { simple: true });
   return typeof journalMode === "string" && journalMode.toLowerCase() === "wal";
 };
 
-const verifyMigrations = (sqlite: Database): string => {
+const verifyMigrations = (sqlite: SqliteDatabase): string => {
   const requiredTables = ["graph_nodes", "graph_edges", "migration_jobs", "connector_configs"];
   const missing = requiredTables.filter((table) => !tableExists(sqlite, table));
   return missing.length === 0 ? "applied" : `missing:${missing.join(",")}`;
 };
 
-const tableExists = (sqlite: Database, table: string): boolean => {
+const tableExists = (sqlite: SqliteDatabase, table: string): boolean => {
   const row = sqlite
     .prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name = ? LIMIT 1")
     .get(table);

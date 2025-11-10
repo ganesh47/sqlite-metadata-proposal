@@ -1,5 +1,4 @@
 import Fastify from "fastify";
-import type { FastifyInstance } from "fastify";
 import cors from "@fastify/cors";
 import pino from "pino";
 import Database from "better-sqlite3";
@@ -22,10 +21,12 @@ export interface StartServerOptions extends ServerOptions {
   port?: number;
   signals?: NodeJS.Signals[];
   exitOnShutdown?: boolean;
-  listenFactory?: (app: FastifyInstance, opts: { port: number; host: string }) => Promise<void>;
+  listenFactory?: (app: AppInstance, opts: { port: number; host: string }) => Promise<void>;
   signalBinder?: (signal: NodeJS.Signals, handler: () => void) => void;
   signalUnbinder?: (signal: NodeJS.Signals, handler: () => void) => void;
 }
+
+type AppInstance = Awaited<ReturnType<typeof buildServer>>;
 
 export const buildServer = async (options: ServerOptions = {}) => {
   const sqlitePath = resolveSqlitePath(options.sqlitePath);
@@ -61,7 +62,7 @@ export const buildServer = async (options: ServerOptions = {}) => {
   return app;
 };
 
-export const startServer = async (options: StartServerOptions = {}): Promise<FastifyInstance> => {
+export const startServer = async (options: StartServerOptions = {}): Promise<AppInstance> => {
   const app = await buildServer(options);
   const port = options.port ?? Number(process.env.API_PORT ?? 8080);
   const host = options.host ?? process.env.API_HOST ?? "0.0.0.0";
@@ -69,7 +70,7 @@ export const startServer = async (options: StartServerOptions = {}): Promise<Fas
   const exitOnShutdown = options.exitOnShutdown ?? true;
   const listenFactory =
     options.listenFactory ??
-    ((instance: FastifyInstance, listenOpts: { port: number; host: string }) =>
+    ((instance: AppInstance, listenOpts: { port: number; host: string }) =>
       instance.listen(listenOpts));
   const bindSignal =
     options.signalBinder ??

@@ -1,4 +1,3 @@
-import request from "supertest";
 import { beforeAll, afterAll, describe, expect, it } from "vitest";
 import type { FastifyInstance } from "fastify";
 import { mkdtempSync } from "node:fs";
@@ -22,10 +21,14 @@ const createNodes = async (app: FastifyInstance) => {
     ],
   };
 
-  await request(app.server)
-    .post("/orgs/demo-org/nodes")
-    .send(payload)
-    .set("content-type", "application/json");
+  await app.inject({
+    method: "POST",
+    url: "/orgs/demo-org/nodes",
+    payload,
+    headers: {
+      "content-type": "application/json",
+    },
+  });
 };
 
 describe("graph contract", () => {
@@ -54,13 +57,17 @@ describe("graph contract", () => {
       ]
     };
 
-    const response = await request(app.server)
-      .post("/orgs/demo-org/nodes")
-      .send(payload)
-      .set("content-type", "application/json");
+    const response = await app.inject({
+      method: "POST",
+      url: "/orgs/demo-org/nodes",
+      payload,
+      headers: {
+        "content-type": "application/json",
+      },
+    });
 
     expect(response.statusCode).toBe(202);
-    expect(response.body).toMatchObject({
+    expect(response.json()).toMatchObject({
       accepted: 1,
       rejected: 0,
       errors: []
@@ -68,13 +75,17 @@ describe("graph contract", () => {
   });
 
   it("rejects node payloads without items", async () => {
-    const response = await request(app.server)
-      .post("/orgs/demo-org/nodes")
-      .send({})
-      .set("content-type", "application/json");
+    const response = await app.inject({
+      method: "POST",
+      url: "/orgs/demo-org/nodes",
+      payload: {},
+      headers: {
+        "content-type": "application/json",
+      },
+    });
 
     expect(response.statusCode).toBe(400);
-    expect(response.body.code).toBe("INVALID_NODE_UPSERT");
+    expect(response.json().code).toBe("INVALID_NODE_UPSERT");
   });
 
   it("accepts valid edge upserts", async () => {
@@ -92,22 +103,30 @@ describe("graph contract", () => {
       ]
     };
 
-    const response = await request(app.server)
-      .post("/orgs/demo-org/edges")
-      .send(payload)
-      .set("content-type", "application/json");
+    const response = await app.inject({
+      method: "POST",
+      url: "/orgs/demo-org/edges",
+      payload,
+      headers: {
+        "content-type": "application/json",
+      },
+    });
 
     expect(response.statusCode).toBe(202);
-    expect(response.body.accepted).toBe(1);
+    expect(response.json().accepted).toBe(1);
   });
 
   it("rejects edge payloads without items", async () => {
-    const response = await request(app.server)
-      .post("/orgs/demo-org/edges")
-      .send({})
-      .set("content-type", "application/json");
+    const response = await app.inject({
+      method: "POST",
+      url: "/orgs/demo-org/edges",
+      payload: {},
+      headers: {
+        "content-type": "application/json",
+      },
+    });
 
     expect(response.statusCode).toBe(400);
-    expect(response.body.code).toBe("INVALID_EDGE_UPSERT");
+    expect(response.json().code).toBe("INVALID_EDGE_UPSERT");
   });
 });

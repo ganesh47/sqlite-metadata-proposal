@@ -1,4 +1,4 @@
-import type { FastifyInstance, FastifyPluginOptions, FastifyRequest } from "fastify";
+import type { FastifyPluginOptions, FastifyRequest } from "fastify";
 import fp from "fastify-plugin";
 
 interface Sample {

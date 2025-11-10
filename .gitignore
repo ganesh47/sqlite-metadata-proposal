@@ -44,6 +44,7 @@ target/
 # Docker / Containers
 docker-compose.override.yml
 *.sqlite
+tools/
 
 # Editors
 .idea/

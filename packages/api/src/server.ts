@@ -1,4 +1,5 @@
 import Fastify from "fastify";
+import type { FastifyInstance } from "fastify";
 import cors from "@fastify/cors";
 import pino from "pino";
 import Database from "better-sqlite3";
@@ -14,6 +15,16 @@ import { metricsPlugin } from "./plugins/metrics.js";
 export interface ServerOptions {
   sqlitePath?: string;
   loggerLevel?: string;
+}
+
+export interface StartServerOptions extends ServerOptions {
+  host?: string;
+  port?: number;
+  signals?: NodeJS.Signals[];
+  exitOnShutdown?: boolean;
+  listenFactory?: (app: FastifyInstance, opts: { port: number; host: string }) => Promise<void>;
+  signalBinder?: (signal: NodeJS.Signals, handler: () => void) => void;
+  signalUnbinder?: (signal: NodeJS.Signals, handler: () => void) => void;
 }
 
 export const buildServer = async (options: ServerOptions = {}) => {
@@ -46,6 +57,62 @@ export const buildServer = async (options: ServerOptions = {}) => {
     sqlite.close();
     done();
   });
+
+  return app;
+};
+
+export const startServer = async (options: StartServerOptions = {}): Promise<FastifyInstance> => {
+  const app = await buildServer(options);
+  const port = options.port ?? Number(process.env.API_PORT ?? 8080);
+  const host = options.host ?? process.env.API_HOST ?? "0.0.0.0";
+  const signals = options.signals ?? ["SIGINT", "SIGTERM"];
+  const exitOnShutdown = options.exitOnShutdown ?? true;
+  const listenFactory =
+    options.listenFactory ??
+    ((instance: FastifyInstance, listenOpts: { port: number; host: string }) =>
+      instance.listen(listenOpts));
+  const bindSignal =
+    options.signalBinder ??
+    ((signal: NodeJS.Signals, handler: () => void) => process.once(signal, handler));
+  const unbindSignal =
+    options.signalUnbinder ??
+    ((signal: NodeJS.Signals, handler: () => void) => process.removeListener(signal, handler));
+
+  const handlers: Array<{ signal: NodeJS.Signals; handler: () => void }> = [];
+
+  const shutdown = async (signal: NodeJS.Signals) => {
+    app.log.info({ signal }, "Shutting down API server");
+    try {
+      await app.close();
+      if (exitOnShutdown) {
+        process.exit(0);
+      }
+    } catch (error) {
+      app.log.error(error);
+      if (exitOnShutdown) {
+        process.exit(1);
+      }
+    }
+  };
+
+  signals.forEach((signal) => {
+    const handler = () => void shutdown(signal);
+    handlers.push({ signal, handler });
+    bindSignal(signal, handler);
+  });
+
+  app.addHook("onClose", (_instance, done) => {
+    handlers.forEach(({ signal, handler }) => unbindSignal(signal, handler));
+    done();
+  });
+
+  try {
+    await listenFactory(app, { port, host });
+    app.log.info({ host, port }, "SQLite Metadata API ready");
+  } catch (error) {
+    app.log.error(error);
+    throw error;
+  }
 
   return app;
 };

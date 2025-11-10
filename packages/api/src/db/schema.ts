@@ -1,4 +1,4 @@
-import { integer, sqliteTable, text, primaryKey, numeric } from "drizzle-orm/sqlite-core";
+import { integer, sqliteTable, text, primaryKey } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
 
 export const graphNodes = sqliteTable(

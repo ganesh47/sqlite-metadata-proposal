@@ -27,6 +27,13 @@ export default defineConfig({
         functions: [80, 90],
         lines: [80, 90]
       }
+    },
+    pool: "threads",
+    poolOptions: {
+      threads: {
+        singleThread: true,
+        isolate: false
+      }
     }
   }
 });

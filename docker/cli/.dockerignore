@@ -1,0 +1,12 @@
+# Keep CLI image contexts small
+**/.git
+**/node_modules
+**/.pnpm-store
+**/tests
+**/*.sqlite
+docs/
+specs/
+docker/
+packages/api
+packages/connectors
+*.md

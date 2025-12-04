@@ -36,6 +36,10 @@ uv run ruff check src
 
 # Run unit tests
 uv run pytest
+
+# Lint + test everything (includes tests directory in Ruff config)
+uv run ruff check
+uv run pytest --maxfail=1 --disable-warnings
 ```
 
 The CLI code lives under `src/metadata_cli/` with the following structure:

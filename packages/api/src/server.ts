@@ -48,7 +48,7 @@ export const buildServer = async (options: ServerOptions = {}) => {
     methods: ["GET", "POST", "OPTIONS"],
   });
 
-  await app.register(metricsPlugin, { sampleSize: 200 });
+  await app.register(metricsPlugin, { sampleSize: 200, histogramLogInterval: 10 });
 
   const graphService = new GraphService(db);
   await app.register(graphRoutes, { graphService });

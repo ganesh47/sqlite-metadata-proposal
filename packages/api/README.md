@@ -10,8 +10,9 @@ This package ships the Fastify service described in `specs/001-plan-alignment/co
 | `API_PORT` | `8080` | Listen port for HTTP traffic. |
 | `API_HOST` | `0.0.0.0` | Bind address for the Fastify server. |
 | `LOG_LEVEL` | `info` | Pino log level (`debug` shows request/metrics traces). |
+| `MIGRATIONS_DIR` | `<repo>/packages/api/migrations` | Optional override when running from a different working directory. |
 
-The server instruments every request with the metrics plugin in `src/plugins/metrics.ts`. Requests that exceed the `<200ms` / `<100ms` latency or `256MB` RSS budgets emit `Performance budget exceeded` warnings directly in the logs.
+The server instruments every request with the metrics plugin in `src/plugins/metrics.ts`. Requests that exceed the `<200ms` / `<100ms` latency or `256MB` RSS budgets emit `Performance budget exceeded` warnings directly in the logs. Histograms are logged on the first request, every 10th request (default), and once during shutdown for post-mortem analysis.
 
 ## Local Development
 
@@ -45,6 +46,7 @@ Failure responses follow the `ErrorResponse` schema:
 
 - `400 INVALID_NODE_UPSERT` / `400 INVALID_EDGE_UPSERT` ⇒ request body failed validation (missing `items`, schema mismatch, FK violation, etc.).
 - `503` ⇒ readiness probe detected missing migrations or WAL not enabled (check `sqlite.migrations` + `sqlite.wal_checkpointed` in the response body).
+- `Performance budget exceeded` warnings ⇒ latency/RSS budgets breached; check histogram logs to see offending routes and max RSS.
 
 ## Docker
 

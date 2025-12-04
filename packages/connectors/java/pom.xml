@@ -21,6 +21,7 @@
     <module>core-client</module>
     <module>connector-template</module>
     <module>examples/http-forwarder</module>
+    <module>integration-tests</module>
   </modules>
 
   <dependencyManagement>

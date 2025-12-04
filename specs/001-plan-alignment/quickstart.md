@@ -43,7 +43,7 @@ curl -X POST http://localhost:8080/orgs/demo-org/edges \
   -d '{"items":[{"id":"edge-1","sourceId":"node-1","targetId":"node-2","type":"link","properties":{}}]}'
 ```
 
-The readiness payload must match `contracts/api.yaml#HealthResponse`. Pino logs show latency histograms to validate Principle IV budgets.
+The readiness payload must match `contracts/api.yaml#HealthResponse`. Pino logs show latency histograms to validate Principle IV budgets. Histograms emit on the first request, every 10th request (default), and on shutdown; `Performance budget exceeded` warnings indicate requests slower than `<200ms` write / `<100ms` read or RSS above `256MB`.
 
 ## 3. Ingest Sample Data via CLI
 
@@ -77,3 +77,4 @@ Connector heartbeats call `POST /connectors/{connectorId}/heartbeat` every 30 
 2. Execute `pytest`, `vitest`, and `mvn test` to ensure all suites pass before pushing.
 3. Update `sqlite-metadata-system.md` §12 and `docs/process.md` with any workflow changes introduced by this stack.
 4. Review the API logs for `Performance budget exceeded` messages from `packages/api/src/plugins/metrics.ts`; any warnings indicate regressions against the latency/RSS contracts.
+5. If the API starts from a different working directory, set `MIGRATIONS_DIR` to point at `packages/api/migrations` so health checks pass and upserts succeed.

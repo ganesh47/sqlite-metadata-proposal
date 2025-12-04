@@ -10,11 +10,6 @@ on:
       - '.github/workflows/stack-build.yml'
   push:
     branches: [main]
-    paths:
-      - 'packages/**'
-      - 'docker/**'
-      - 'specs/001-plan-alignment/**'
-      - '.github/workflows/stack-build.yml'
   workflow_dispatch:
 
 permissions:

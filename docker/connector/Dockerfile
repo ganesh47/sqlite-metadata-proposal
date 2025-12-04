@@ -1,15 +1,28 @@
-FROM eclipse-temurin:21-jdk AS build
+FROM maven:3.9.9-eclipse-temurin-21 AS build
 WORKDIR /workspace
 
-COPY packages/connectors/java/pom.xml ./pom.xml
-COPY packages/connectors/java/core-client/pom.xml core-client/pom.xml
-COPY packages/connectors/java/connector-template/pom.xml connector-template/pom.xml
-COPY packages/connectors/java/examples/http-forwarder/pom.xml examples/http-forwarder/pom.xml
+# Copy Maven project
+COPY packages/connectors/java/ .
 
+# Fetch dependencies and build the http-forwarder example (brings in template + client)
 RUN --mount=type=cache,target=/root/.m2 \
-    mvn -q -e -B dependency:go-offline && \
-    echo "Connector Dockerfile scaffold ready. Add source files + package steps in US3."
+    mvn -q -B -pl examples/http-forwarder -am dependency:go-offline && \
+    mvn -q -B -pl examples/http-forwarder -am package
 
 FROM eclipse-temurin:21-jre AS runtime
-WORKDIR /srv/connector
-CMD ["bash", "-lc", "echo 'Connector container placeholder – build Spring Boot app during US3' && tail -f /dev/null"]
+ENV APP_HOME=/srv/connector \
+    JAVA_OPTS=""
+WORKDIR ${APP_HOME}
+
+COPY --from=build /workspace/examples/http-forwarder/target/http-forwarder-*.jar ${APP_HOME}/app.jar
+COPY docker/connector/entrypoint.sh /usr/local/bin/entrypoint.sh
+
+RUN addgroup --system connector && \
+    adduser --system --home ${APP_HOME} --ingroup connector connector && \
+    chown -R connector:connector ${APP_HOME} && \
+    chmod +x /usr/local/bin/entrypoint.sh
+
+USER connector
+EXPOSE 8082
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

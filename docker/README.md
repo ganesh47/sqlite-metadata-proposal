@@ -30,11 +30,14 @@ If your Docker version does not support `--ignorefile`, omit the flag—the imag
 ```bash
 docker build \
   -f docker/cli/Dockerfile \
+  --ignorefile docker/cli/.dockerignore \
   --build-arg BUILD_SHA=$(git rev-parse HEAD) \
   --build-arg BUILD_VERSION=dev \
   -t ghcr.io/ganesh47/sqlite-meta-cli:dev .
 
-docker run --rm ghcr.io/ganesh47/sqlite-meta-cli:dev --help
+docker run --rm \
+  -v $(pwd)/data:/data \
+  ghcr.io/ganesh47/sqlite-meta-cli:dev --help
 
 # Push + sign (requires GHCR_PAT and cosign keyless or envs set)
 docker push ghcr.io/ganesh47/sqlite-meta-cli:dev

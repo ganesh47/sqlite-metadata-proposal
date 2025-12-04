@@ -60,6 +60,11 @@ docker build -f docker/cli/Dockerfile -t ghcr.io/ganesh47/sqlite-meta-cli:dev .
 docker run --rm \
   -e API_URL=http://host.docker.internal:8080 \
   -e API_TOKEN=$API_TOKEN \
+  -v $(pwd)/data:/data \
   ghcr.io/ganesh47/sqlite-meta-cli:dev \
   ingest --org demo-org --file /data/sample.json
 ```
+
+Notes:
+- The image runs as a non-root `metadata` user and writes the job store to `/data/jobs.sqlite` by default—mount a host volume to `/data` to persist history.
+- Use `--ignorefile docker/cli/.dockerignore` when building from repo root to shrink context.

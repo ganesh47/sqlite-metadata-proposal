@@ -29,5 +29,10 @@ LABEL org.opencontainers.image.source="https://github.com/ganesh47/sqlite-metada
       org.opencontainers.image.title="SQLite Metadata CLI" \
       org.opencontainers.image.description="Typer-based ingestion CLI for the SQLite metadata platform"
 
+RUN useradd --create-home --shell /bin/bash metadata && \
+    mkdir -p /data && chown -R metadata:metadata /srv/cli /data
+
+USER metadata
+
 ENTRYPOINT ["/usr/local/bin/metadata-cli-entrypoint"]
 CMD ["ingest", "--help"]

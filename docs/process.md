@@ -55,13 +55,13 @@ This repository tracks the evolution of the **SQLite Metadata System** proposal.
 
 | Scope | Command(s) | Notes |
 |-------|------------|-------|
-| API (TypeScript) | `cd packages/api && pnpm lint && pnpm vitest run` | Uses Node.js 20 + Fastify + Drizzle; relies on `.pnpm-store` inside the repo so CI runners have write access. |
-| CLI (Python) | `cd packages/cli && uv run ruff check . && uv run pytest` | Typer/SQLAlchemy stack; keep fixtures in `packages/cli/tests`. |
-| Connectors (Java) | `cd packages/connectors/java && mvn --batch-mode verify` | Java 21 + Spring Boot template with Spotless/Checkstyle. |
-| Docker images | `docker build -f docker/api/Dockerfile .` etc. | API/CLI/connector images must produce SBOM + signed artifacts; scripts live under `docker/` and `scripts/`. |
+| API (TypeScript) | `cd packages/api && pnpm lint && pnpm vitest run` | Node.js 20 + Fastify + Drizzle; `.pnpm-store` lives in-repo for CI. |
+| CLI (Python) | `cd packages/cli && uv run ruff check . && uv run pytest` | Typer/SQLAlchemy stack; fixtures stay in `packages/cli/tests`. |
+| Connectors (Java) | `cd packages/connectors/java && mvn --batch-mode verify` | Java 21 + Spring Boot template with Spotless/Checkstyle enforced. |
+| Docker images | `docker buildx build -f docker/api/Dockerfile .` etc. | API/CLI/connector images publish to GHCR with SBOM + Cosign; see `docker/README.md`. |
 
 ## Automation
-- `stack-build.yml` runs pnpm/uv/maven lint+test suites, Hadolint, Spectral, Docker Buildx, and SBOM signing for every PR and merge to `main`.
+- `stack-build.yml` runs pnpm/uv/maven lint+test suites, Hadolint, Spectral, Docker Buildx, and SBOM signing for every PR and merge to `main`, and publishes API/CLI/connector images to GHCR when on `main`.
 - Link checks: Lychee link checker nightly and on PRs touching docs.
 - Proposal snapshot: build & archive HTML/PDF on merge to `main` (planned).
 - Spec sync: `Sync Spec Tasks` workflow (weekly and on demand) reads `specs/tasks.json`

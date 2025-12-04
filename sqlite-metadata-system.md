@@ -251,26 +251,22 @@
 
 ## 12. Next Steps
 
-1. **Ratify the polyglot delivery stack.** Lock the Fastify + TypeScript +
-   Drizzle API on Node.js 20, the Typer/SQLAlchemy CLI on Python 3.12, and the
-   Spring Boot connector template on Java 21. Every artifact must ship as a
-   Docker image (API, CLI, connector) with SBOM + signing metadata and be
-   referenced from the proposal.
-2. **Finish the repo + CI scaffolding.** Keep `packages/api`, `packages/cli`,
-   and `packages/connectors/java` as the primary workspaces and maintain the
-   Docker build context under `docker/`. The `stack-build` workflow must run
-   `pnpm lint && pnpm test`, `uv run ruff check . && uv run pytest`, `mvn
-   --batch-mode verify`, Hadolint, Spectral, and Docker Buildx pushes so every
-   surface stays green.
-3. **Document the ingestion & migration story.** Capture the CLI migration
-   process (e.g., how YouTube8M is transformed into SQLite) in
-   `docs/quickstart.md`, enumerate dataset ergonomics, and keep
-   `sqlite-metadata-system.md` + `docs/process.md` aligned with the approved
-   TypeScript/Python/Java + Docker workflow.
-4. **Schedule iterative demos.** Operate Phase 1 as a sprint cadence that
-   exercises the API compose stack, CLI ingestion runs, and connector heartbeats
-   so stakeholders can review image digests, performance budgets, and outstanding
-   risks.
+1. **Polyglot delivery stack is locked.** Fastify + TypeScript + Drizzle on
+   Node.js 20 for the API, Typer/SQLAlchemy on Python 3.12 for the CLI, and a
+   Spring Boot connector template on Java 21. API/CLI/connector Docker images
+   now publish to GHCR with SBOM + Cosign signing from `stack-build`.
+2. **Repo + CI scaffolding is active.** Primary workspaces live under
+   `packages/api`, `packages/cli`, and `packages/connectors/java` with Docker
+   contexts in `docker/`. `stack-build` runs pnpm lint/test, uv + pytest, Maven
+   verify, Hadolint, Spectral, Buildx image builds, SBOMs, and Cosign signing on
+   every PR/main push (API/CLI/connector).
+3. **Document ingestion & migration.** Capture the CLI migration flow
+   (e.g., YouTube8M → SQLite) in `docs/quickstart.md`, enumerate dataset
+   ergonomics, and keep this proposal plus `docs/process.md` aligned with the
+   approved TypeScript/Python/Java + Docker workflow and publishing steps.
+4. **Iterative demos cadence.** Run sprint demos exercising the compose stack,
+   CLI ingestion runs, and connector heartbeats/forwarder example; include image
+   digests, perf budgets (latency/RSS), and outstanding risks in demo notes.
 
 Prepared as a forward-looking plan that leverages lessons from the Cloudflare
 implementation while enabling a broader deployment footprint.

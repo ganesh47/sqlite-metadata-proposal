@@ -163,14 +163,6 @@ components:
               type: boolean
             migrations:
               type: string
-    Pagination:
-      type: object
-      properties:
-        cursor:
-          type: string
-        hasMore:
-          type: boolean
-      required: [cursor, hasMore]
     ErrorResponse:
       type: object
       properties:

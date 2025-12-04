@@ -46,4 +46,6 @@ def cli_settings() -> CliSettings:
 
 @pytest.fixture()
 def job_store(tmp_path: Path) -> MigrationJobStore:
-    return MigrationJobStore(tmp_path / "jobs.sqlite")
+    store = MigrationJobStore(tmp_path / "jobs.sqlite")
+    yield store
+    store.close()

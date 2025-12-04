@@ -19,6 +19,7 @@ env:
   REGISTRY: ghcr.io
   API_IMAGE: ghcr.io/${{ github.repository_owner }}/sqlite-meta-api
   CLI_IMAGE: ghcr.io/${{ github.repository_owner }}/sqlite-meta-cli
+  CONNECTOR_IMAGE: ghcr.io/${{ github.repository_owner }}/sqlite-meta-connector
   GHCR_USERNAME: ${{ github.repository_owner }}
 
 jobs:
@@ -292,3 +293,92 @@ jobs:
             --type spdx \
             --predicate "sbom-cli.json" \
             "${{ env.CLI_IMAGE }}@${{ steps.build_cli.outputs.digest }}"
+
+  publish_connector:
+    runs-on: ubuntu-latest
+    needs: stack
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for GHCR_PAT secret
+        id: ghcr_pat
+        run: |
+          if [ -z "${{ secrets.GHCR_PAT }}" ]; then
+            echo "missing=true" >> "$GITHUB_OUTPUT"
+            echo "GHCR_PAT secret is not configured; skipping publish job."
+          else
+            echo "missing=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up QEMU
+        if: steps.ghcr_pat.outputs.missing == 'false'
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Buildx
+        if: steps.ghcr_pat.outputs.missing == 'false'
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        if: steps.ghcr_pat.outputs.missing == 'false'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.GHCR_USERNAME }}
+          password: ${{ secrets.GHCR_PAT }}
+
+      - name: Docker metadata
+        if: steps.ghcr_pat.outputs.missing == 'false'
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.CONNECTOR_IMAGE }}
+          tags: |
+            type=raw,value=dev
+            type=sha,prefix=sha-
+
+      - name: Build and push Connector image
+        if: steps.ghcr_pat.outputs.missing == 'false'
+        id: build_connector
+        uses: docker/build-push-action@v5
+        with:
+          file: docker/connector/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Generate SBOM (Connector release)
+        if: steps.ghcr_pat.outputs.missing == 'false'
+        id: sbom
+        uses: anchore/sbom-action@v0
+        with:
+          image: ${{ env.CONNECTOR_IMAGE }}@${{ steps.build_connector.outputs.digest }}
+          output-file: sbom-connector.json
+          artifact-name: sqlite-meta-connector-sbom
+
+      - name: Install Cosign
+        if: steps.ghcr_pat.outputs.missing == 'false'
+        uses: sigstore/cosign-installer@v3
+
+      - name: Sign Connector image
+        if: steps.ghcr_pat.outputs.missing == 'false'
+        env:
+          COSIGN_EXPERIMENTAL: "true"
+          COSIGN_YES: "true"
+        run: |
+          cosign sign "${{ env.CONNECTOR_IMAGE }}@${{ steps.build_connector.outputs.digest }}"
+
+      - name: Attach SBOM attestation (Connector)
+        if: steps.ghcr_pat.outputs.missing == 'false'
+        env:
+          COSIGN_EXPERIMENTAL: "true"
+          COSIGN_YES: "true"
+        run: |
+          cosign attest \
+            --type spdx \
+            --predicate "sbom-connector.json" \
+            "${{ env.CONNECTOR_IMAGE }}@${{ steps.build_connector.outputs.digest }}"

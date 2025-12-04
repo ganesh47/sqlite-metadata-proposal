@@ -6,6 +6,7 @@ from pathlib import Path
 import httpx
 import pytest
 
+from metadata_cli.config import CliSettings
 from metadata_cli.errors import DatasetValidationError, IngestionError
 from metadata_cli.services.ingest import IngestionRunner
 
@@ -152,4 +153,3 @@ def test_csv_ingest_parses_nodes_and_edges(sample_csv, cli_settings, job_store):
     metrics = job_store.list_jobs()[0].metrics
     assert metrics["nodesAccepted"] == 2
     assert metrics["edgesAccepted"] == 1
-*** End Patch Mistake/Error ***!

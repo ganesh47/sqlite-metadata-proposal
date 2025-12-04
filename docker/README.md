@@ -8,15 +8,22 @@ This directory contains the multi-stage Dockerfiles and compose stacks described
 docker build \
   --ignorefile docker/api/.dockerignore \
   -f docker/api/Dockerfile \
+  --build-arg BUILD_SHA=$(git rev-parse HEAD) \
+  --build-arg BUILD_VERSION=dev \
   -t ghcr.io/ganesh47/sqlite-meta-api:dev .
 
 docker run --rm -p 8080:8080 \
   -e SQLITE_PATH=/data/metadata.sqlite \
   -v $(pwd)/data:/data \
   ghcr.io/ganesh47/sqlite-meta-api:dev
+
+# Push + sign (requires GHCR_PAT and cosign keyless or envs set)
+docker push ghcr.io/ganesh47/sqlite-meta-api:dev
+cosign sign ghcr.io/ganesh47/sqlite-meta-api:dev
 ```
 
 The build stage uses `pnpm deploy` to publish the compiled Fastify service plus production dependencies into `/opt/app`, and the runtime stage executes `node dist/index.js` on Node.js 20 LTS. Use the optional `--ignorefile docker/api/.dockerignore` flag so Docker avoids sending the entire repository as context.
+If your Docker version does not support `--ignorefile`, omit the flag—the image still builds correctly.
 
 ## CLI Image (`docker/cli/Dockerfile`)
 

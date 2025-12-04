@@ -1,0 +1,9 @@
+server:
+  port: 8081
+
+metadata:
+  connector:
+    connector-id: demo-connector
+    api-base-url: http://localhost:3000
+    org-id: demo-org
+    heartbeat-interval-ms: 10000

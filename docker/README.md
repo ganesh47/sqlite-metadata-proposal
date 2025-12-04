@@ -69,3 +69,11 @@ All published images **must**:
 - include provenance for the Git SHA in CI logs.
 
 Refer to `specs/001-plan-alignment/quickstart.md` for the end-to-end workflow (build → test → sign → push) and ensure the README stays updated as new targets are added.
+
+### Helper script
+
+Use `scripts/publish-images.sh` to build, push, generate SBOMs, and sign the API/CLI/connector images in one step (requires `cosign` and access to GHCR):
+
+```bash
+REGISTRY=ghcr.io GHCR_USERNAME=ganesh47 VERSION=dev scripts/publish-images.sh
+```

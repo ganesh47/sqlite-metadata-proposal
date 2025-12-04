@@ -23,6 +23,8 @@ class EdgeModel(BaseModel):
     targetId: str
     type: str
     properties: Dict[str, Any]
+    createdBy: Optional[str] = None
+    updatedBy: Optional[str] = None
 
     model_config = ConfigDict(extra="ignore")
 

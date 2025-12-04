@@ -37,6 +37,7 @@ def test_ingest_success_posts_nodes_and_edges(sample_dataset, cli_settings, job_
         "/orgs/demo-org/edges",
     ]
     assert captured[0][1]["items"][0]["id"] == "node-1"
+    assert captured[0][1]["items"][0]["createdBy"] == cli_settings.source
     metrics = job_store.list_jobs()[0].metrics
     assert metrics["nodesAccepted"] == 2
     assert metrics["edgesAccepted"] == 1
@@ -111,6 +112,7 @@ def test_ndjson_ingest_merges_records(sample_ndjson, cli_settings, job_store):
         "/orgs/demo-org/edges",
     ]
     assert captured[0][1]["items"][0]["id"] == "node-1"
+    assert captured[1][1]["items"][0]["createdBy"] == cli_settings.source
     metrics = job_store.list_jobs()[0].metrics
     assert metrics["nodesAccepted"] == 1
     assert metrics["edgesAccepted"] == 1
@@ -145,6 +147,8 @@ def test_csv_ingest_parses_nodes_and_edges(sample_csv, cli_settings, job_store):
         "/orgs/demo-org/nodes",
         "/orgs/demo-org/edges",
     ]
+    assert captured[0][1]["items"][0]["createdBy"] == cli_settings.source
+    assert captured[1][1]["items"][0]["createdBy"] == cli_settings.source
     metrics = job_store.list_jobs()[0].metrics
     assert metrics["nodesAccepted"] == 2
     assert metrics["edgesAccepted"] == 1

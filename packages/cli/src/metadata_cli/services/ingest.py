@@ -212,6 +212,15 @@ class IngestionRunner:
 
     def _decorate_item(self, model: NodeModel | EdgeModel) -> NodeModel | EdgeModel:
         payload = model.model_copy()
-        if isinstance(payload, NodeModel) and not payload.createdBy:
-            payload.createdBy = self.settings.source
+        actor = self.settings.source
+        if isinstance(payload, NodeModel):
+            if not payload.createdBy:
+                payload.createdBy = actor
+            if not payload.updatedBy:
+                payload.updatedBy = payload.createdBy
+        else:
+            if not payload.createdBy:
+                payload.createdBy = actor
+            if not payload.updatedBy:
+                payload.updatedBy = payload.createdBy
         return payload

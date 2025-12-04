@@ -15,6 +15,7 @@ def _make_client(handler) -> httpx.Client:
 
 
 def test_ingest_success_posts_nodes_and_edges(sample_dataset, cli_settings, job_store):
+    """Happy path: nodes + edges shipped in two batches with job metrics captured."""
     captured: list[tuple[str, dict]] = []
 
     def handler(request: httpx.Request) -> httpx.Response:
@@ -78,3 +79,4 @@ def test_api_failure_marks_job_failed(sample_dataset, cli_settings, job_store):
     stored_job = job_store.list_jobs()[0]
     assert stored_job.status == "failed"
     assert stored_job.metrics["nodesAccepted"] == 2
+*** End Patch Mistake/Error ***!

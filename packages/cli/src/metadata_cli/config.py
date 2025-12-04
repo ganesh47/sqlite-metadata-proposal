@@ -51,8 +51,9 @@ class CliSettings:
             raise ValueError("API URL is required")
         if batch_size <= 0:
             raise ValueError("Batch size must be greater than zero")
-        if dataset_format.lower() != "json":
-            raise ValueError("Only JSON datasets are supported")
+        normalized_format = dataset_format.lower()
+        if normalized_format not in {"json", "ndjson", "csv"}:
+            raise ValueError("Supported dataset formats: json, ndjson, csv")
         return cls(
             org_id=org,
             api_url=api_url,
@@ -60,5 +61,5 @@ class CliSettings:
             batch_size=batch_size,
             source=source or "cli",
             job_store_path=job_store,
-            dataset_format=dataset_format.lower(),
+            dataset_format=normalized_format,
         )

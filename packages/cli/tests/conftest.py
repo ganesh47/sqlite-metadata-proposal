@@ -34,6 +34,33 @@ def sample_dataset(tmp_path: Path) -> Path:
 
 
 @pytest.fixture()
+def sample_ndjson(tmp_path: Path) -> Path:
+    """Create an NDJSON dataset with split records."""
+    lines = [
+        json.dumps({"nodes": [{"id": "node-1", "type": "workspace", "properties": {}}]}),
+        json.dumps({"edges": [{"id": "edge-1", "sourceId": "node-1", "targetId": "node-2", "type": "link", "properties": {}}]}),
+        json.dumps({"metadata": {"source": "ndjson-test"}}),
+    ]
+    dataset_path = tmp_path / "dataset.ndjson"
+    dataset_path.write_text("\n".join(lines), encoding="utf-8")
+    return dataset_path
+
+
+@pytest.fixture()
+def sample_csv(tmp_path: Path) -> Path:
+    """Create a CSV dataset with nodes and edges rows."""
+    lines = [
+        "id,type,properties,sourceId,targetId",
+        "node-1,workspace,\"{\\\"name\\\": \\\"alpha\\\"}\",,",
+        "node-2,workspace,\"{\\\"name\\\": \\\"beta\\\"}\",,",
+        "edge-1,link,\"{\\\"reason\\\": \\\"demo\\\"}\",node-1,node-2",
+    ]
+    dataset_path = tmp_path / "dataset.csv"
+    dataset_path.write_text("\n".join(lines), encoding="utf-8")
+    return dataset_path
+
+
+@pytest.fixture()
 def cli_settings() -> CliSettings:
     return CliSettings(
         org_id="demo-org",

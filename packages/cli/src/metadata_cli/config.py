@@ -43,6 +43,7 @@ class CliSettings:
         batch_size: int,
         source: Optional[str],
         job_store: Optional[Path],
+        dataset_format: str,
     ) -> "CliSettings":
         if not org:
             raise ValueError("Organization id is required")
@@ -50,6 +51,8 @@ class CliSettings:
             raise ValueError("API URL is required")
         if batch_size <= 0:
             raise ValueError("Batch size must be greater than zero")
+        if dataset_format.lower() != "json":
+            raise ValueError("Only JSON datasets are supported")
         return cls(
             org_id=org,
             api_url=api_url,
@@ -57,4 +60,5 @@ class CliSettings:
             batch_size=batch_size,
             source=source or "cli",
             job_store_path=job_store,
+            dataset_format=dataset_format.lower(),
         )

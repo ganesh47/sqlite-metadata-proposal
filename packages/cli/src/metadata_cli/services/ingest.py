@@ -14,7 +14,10 @@ from metadata_cli.config import CliSettings
 from metadata_cli.db.migrations import MigrationJobStore, MigrationJobRecord
 from metadata_cli.errors import DatasetValidationError, IngestionError
 from metadata_cli.models import DatasetModel, EdgeModel, NodeModel
-from metadata_cli.utils.logging import ProgressLogger
+from metadata_cli.utils.logging import ProgressLogger, get_rss_mb
+
+BATCH_LATENCY_BUDGET_SECONDS = 5.0
+RSS_BUDGET_MB = 256.0
 
 
 def _batched(items: Sequence, size: int) -> Iterable[Sequence]:
@@ -188,6 +191,7 @@ class IngestionRunner:
         url = f"{self.settings.base_url}{path}"
 
         for batch in _batched(items, self.settings.batch_size):
+            batch_start = time.perf_counter()
             payload = {
                 "items": [
                     self._decorate_item(model).model_dump(by_alias=True) for model in batch
@@ -196,11 +200,15 @@ class IngestionRunner:
             }
             response = self.http_client.post(url, headers=self.settings.default_headers, json=payload)
             metrics["batches"] += 1
-            self.logger.info(
-                "batch.sent",
+            duration = time.perf_counter() - batch_start
+            self.logger.log_batch(
                 endpoint=resource,
                 batch_size=len(batch),
                 status=response.status_code,
+                duration_seconds=duration,
+                rss_mb=get_rss_mb(),
+                latency_budget_seconds=BATCH_LATENCY_BUDGET_SECONDS,
+                rss_budget_mb=RSS_BUDGET_MB,
             )
             if response.status_code >= 400:
                 raise IngestionError(

@@ -9,6 +9,7 @@ from typing import Any, Optional
 from metadata_cli.models import MigrationJobRecord
 
 DEFAULT_DB_PATH = Path.home() / ".metadata-cli" / "jobs.sqlite"
+JOB_STATUSES = {"queued", "running", "succeeded", "failed"}
 
 
 class MigrationJobStore:
@@ -39,21 +40,86 @@ class MigrationJobStore:
         )
         self._conn.commit()
 
-    def start_job(self, *, job_id: str, source: str) -> MigrationJobRecord:
-        now = datetime.now(timezone.utc)
+    def queue_job(
+        self,
+        *,
+        job_id: str,
+        source: str,
+        image_digest: str | None = None,
+        logs_url: str | None = None,
+    ) -> MigrationJobRecord:
         record = MigrationJobRecord(
             job_id=job_id,
             source=source,
-            status="running",
-            started_at=now,
+            status="queued",
+            started_at=datetime.now(timezone.utc),
+            metrics={},
+            image_digest=image_digest,
+            logs_url=logs_url,
         )
         self._conn.execute(
             """
             INSERT OR REPLACE INTO migration_jobs (
-                job_id, source, status, started_at, metrics
-            ) VALUES (?, ?, ?, ?, ?)
+                job_id, source, status, started_at, metrics, image_digest, logs_url
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)
             """,
-            (record.job_id, record.source, record.status, record.started_at.isoformat(), json.dumps({})),
+            (
+                record.job_id,
+                record.source,
+                record.status,
+                record.started_at.isoformat(),
+                json.dumps(record.metrics),
+                record.image_digest,
+                record.logs_url,
+            ),
+        )
+        self._conn.commit()
+        return record
+
+    def start_job(
+        self,
+        *,
+        job_id: str,
+        source: str,
+        image_digest: str | None = None,
+        logs_url: str | None = None,
+    ) -> MigrationJobRecord:
+        existing = self._get_optional_row(job_id)
+        if existing:
+            started_at = datetime.fromisoformat(existing["started_at"])
+        else:
+            started_at = datetime.now(timezone.utc)
+
+        record = MigrationJobRecord(
+            job_id=job_id,
+            source=source,
+            status="running",
+            started_at=started_at,
+            metrics=json.loads(existing["metrics"]) if existing and existing["metrics"] else {},
+            image_digest=image_digest or (existing["image_digest"] if existing else None),
+            logs_url=logs_url or (existing["logs_url"] if existing else None),
+        )
+
+        self._conn.execute(
+            """
+            INSERT INTO migration_jobs (job_id, source, status, started_at, metrics, image_digest, logs_url)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(job_id) DO UPDATE SET
+              status=excluded.status,
+              source=excluded.source,
+              metrics=excluded.metrics,
+              image_digest=COALESCE(excluded.image_digest, migration_jobs.image_digest),
+              logs_url=COALESCE(excluded.logs_url, migration_jobs.logs_url)
+            """,
+            (
+                record.job_id,
+                record.source,
+                record.status,
+                record.started_at.isoformat(),
+                json.dumps(record.metrics),
+                record.image_digest,
+                record.logs_url,
+            ),
         )
         self._conn.commit()
         return record
@@ -66,6 +132,9 @@ class MigrationJobStore:
         metrics: dict[str, Any],
         logs_url: str | None = None,
     ) -> MigrationJobRecord:
+        if status not in JOB_STATUSES:
+            raise ValueError(f"Unsupported status {status}")
+
         now = datetime.now(timezone.utc)
         self._conn.execute(
             """
@@ -73,7 +142,7 @@ class MigrationJobStore:
                SET status = ?,
                    completed_at = ?,
                    metrics = ?,
-                   logs_url = ?
+                   logs_url = COALESCE(?, logs_url)
              WHERE job_id = ?
             """,
             (status, now.isoformat(), json.dumps(metrics), logs_url, job_id),
@@ -95,6 +164,11 @@ class MigrationJobStore:
         if row is None:
             raise KeyError(f"job {job_id} not found")
         return row
+
+    def _get_optional_row(self, job_id: str) -> sqlite3.Row | None:
+        return self._conn.execute(
+            "SELECT * FROM migration_jobs WHERE job_id = ?", (job_id,)
+        ).fetchone()
 
     def _row_to_record(self, row: sqlite3.Row) -> MigrationJobRecord:
         metrics = json.loads(row["metrics"]) if row["metrics"] else {}

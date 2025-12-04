@@ -25,7 +25,7 @@ uv run metadata-cli ingest \
 - `--api-token` (`API_TOKEN`): Bearer token sent with each request.
 - `--batch-size` (`CLI_BATCH_SIZE`): Request payload size (default `500`).
 - `--source` (`CLI_SOURCE`): Label recorded in job metadata (`cli` by default).
-- `--dataset-format` (`CLI_DATASET_FORMAT`): Dataset format (currently only `json`).
+- `--dataset-format` (`CLI_DATASET_FORMAT`): Dataset format (`json`, `ndjson`, or `csv`). CSV must include headers for nodes (`id`, `type`, `properties`) and edges (`sourceId`, `targetId`, `type`, `properties`); rows with `sourceId` + `targetId` are treated as edges.
 - `--job-store` (`CLI_JOB_STORE`): Location for the local job-history SQLite DB. Defaults to
   `~/.metadata-cli/jobs.sqlite`.
 

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import csv
 import json
 import time
 import uuid
@@ -30,17 +31,87 @@ class DatasetLoader:
     def load(self, path: Path) -> DatasetModel:
         if not path.exists():
             raise DatasetValidationError(f"Dataset file {path} does not exist")
-        if self._format != "json":
+        if self._format == "json":
+            payloads = [self._load_json(path)]
+        elif self._format == "ndjson":
+            payloads = list(self._load_ndjson(path))
+        elif self._format == "csv":
+            payloads = [self._load_csv(path)]
+        else:
             raise DatasetValidationError(f"Unsupported dataset format: {self._format}")
+
+        combined = self._merge_payloads(payloads)
+
         try:
-            payload = json.loads(path.read_text(encoding="utf-8"))
+            return DatasetModel.model_validate(combined)
+        except ValidationError as exc:
+            raise DatasetValidationError(str(exc)) from exc
+
+    def _load_json(self, path: Path) -> dict:
+        try:
+            return json.loads(path.read_text(encoding="utf-8"))
         except json.JSONDecodeError as exc:
             raise DatasetValidationError("Dataset file is not valid JSON") from exc
 
+    def _load_ndjson(self, path: Path) -> Iterable[dict]:
+        payloads: list[dict] = []
         try:
-            return DatasetModel.model_validate(payload)
-        except ValidationError as exc:
-            raise DatasetValidationError(str(exc)) from exc
+            for line in path.read_text(encoding="utf-8").splitlines():
+                if not line.strip():
+                    continue
+                payloads.append(json.loads(line))
+        except json.JSONDecodeError as exc:
+            raise DatasetValidationError("NDJSON file contains invalid JSON line") from exc
+        if not payloads:
+            raise DatasetValidationError("NDJSON file is empty")
+        return payloads
+
+    def _merge_payloads(self, payloads: Sequence[dict]) -> dict:
+        merged: dict[str, list] = {"nodes": [], "edges": [], "metadata": {}}
+        for payload in payloads:
+            merged["nodes"].extend(payload.get("nodes", []))
+            merged["edges"].extend(payload.get("edges", []))
+            merged["metadata"].update(payload.get("metadata", {}))
+        return merged
+
+    def _load_csv(self, path: Path) -> dict:
+        nodes: list[dict] = []
+        edges: list[dict] = []
+        with path.open(encoding="utf-8") as handle:
+            reader = csv.DictReader(handle)
+            for row in reader:
+                clean = {k: v for k, v in row.items() if v not in (None, "", "null")}
+                properties = self._coerce_properties(clean.pop("properties", "{}"))
+                if "sourceId" in clean and "targetId" in clean:
+                    edges.append(
+                        {
+                            "id": clean.get("id") or uuid.uuid4().hex,
+                            "sourceId": clean["sourceId"],
+                            "targetId": clean["targetId"],
+                            "type": clean.get("type", "link"),
+                            "properties": properties,
+                        }
+                    )
+                else:
+                    nodes.append(
+                        {
+                            "id": clean.get("id") or uuid.uuid4().hex,
+                            "type": clean.get("type", "node"),
+                            "properties": properties,
+                            "createdBy": clean.get("createdBy"),
+                        }
+                    )
+        if not nodes and not edges:
+            raise DatasetValidationError("CSV file is empty or missing node/edge rows")
+        return {"nodes": nodes, "edges": edges, "metadata": {}}
+
+    def _coerce_properties(self, raw: str) -> dict:
+        if not raw:
+            return {}
+        try:
+            return json.loads(raw)
+        except json.JSONDecodeError:
+            return {"raw": raw}
 
 
 class IngestionRunner:

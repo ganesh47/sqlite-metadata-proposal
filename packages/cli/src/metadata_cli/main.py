@@ -14,6 +14,12 @@ app = typer.Typer(help="SQLite metadata ingestion CLI.", add_completion=False)
 
 @app.command()
 def ingest(
+    dataset_format: str = typer.Option(
+        "json",
+        "--dataset-format",
+        envvar="CLI_DATASET_FORMAT",
+        help="Dataset format (currently only json).",
+    ),
     file: Path = typer.Argument(..., exists=True, readable=True, help="Dataset file to ingest."),
     org: str = typer.Option(..., "--org", "-o", help="Organization identifier."),
     api_url: str = typer.Option(
@@ -57,6 +63,7 @@ def ingest(
             batch_size=batch_size,
             source=source,
             job_store=job_store,
+            dataset_format=dataset_format,
         )
     except ValueError as exc:
         typer.secho(f"Configuration error: {exc}", err=True, fg=typer.colors.RED)
